@@ -1,3 +1,5 @@
+import webbrowser
+
 from kivy.lang import Builder
 from kivy.properties import StringProperty
 from kivy.uix.screenmanager import Screen
@@ -5,8 +7,11 @@ from kivy.uix.screenmanager import Screen
 from apno import __version__
 from apno.utils.icons import icon
 
+WEBSITE_URL = "https://guillermodotn.github.io/apno/"
+GITHUB_URL = "https://github.com/guillermodotn/apno"
+
 Builder.load_string("""
-#:import StyledCard apno.widgets.styled_card.StyledCard
+#:import ClickableCard apno.widgets.styled_card.ClickableCard
 
 <AboutScreen>:
     ScrollView:
@@ -37,6 +42,15 @@ Builder.load_string("""
                 size_hint_y: None
                 height: dp(20)
 
+            Label:
+                text: root.description_text
+                font_size: sp(14)
+                color: 0.4, 0.4, 0.4, 1
+                size_hint_y: None
+                height: self.texture_size[1]
+                text_size: self.width, None
+                halign: "center"
+
             Widget:
                 size_hint_y: None
                 height: dp(1)
@@ -47,73 +61,77 @@ Builder.load_string("""
                         pos: self.pos
                         size: self.size
 
-            Label:
-                text: "About Apnea Training"
-                font_size: sp(18)
-                bold: True
-                color: 0.2, 0.2, 0.2, 1
+            ClickableCard:
+                orientation: "horizontal"
                 size_hint_y: None
-                height: dp(32)
-                text_size: self.size
-                halign: "left"
-                valign: "middle"
-
-            Label:
-                text: "Apnea training improves breath-holding through practice."
-                font_size: sp(14)
-                color: 0.4, 0.4, 0.4, 1
-                size_hint_y: None
-                height: dp(48)
-                text_size: self.width, None
-                halign: "left"
-
-            StyledCard:
-                orientation: "vertical"
-                size_hint_y: None
-                height: dp(100)
-                spacing: dp(4)
+                height: dp(64)
+                spacing: dp(12)
+                on_release: root.open_website()
 
                 Label:
-                    text: "O2 Tables"
-                    font_size: sp(16)
-                    bold: True
-                    color: 0.2, 0.7, 0.4, 1
-                    size_hint_y: None
-                    height: dp(24)
-                    text_size: self.size
-                    halign: "left"
-                    valign: "middle"
+                    text: root.icon_web
+                    font_name: "Icons"
+                    font_size: sp(28)
+                    color: 0.15, 0.4, 0.65, 1
+                    size_hint_x: None
+                    width: dp(32)
 
-                Label:
-                    text: "Fixed hold with decreasing rest. Improves O2 efficiency."
-                    font_size: sp(14)
-                    color: 0.4, 0.4, 0.4, 1
-                    text_size: self.width - dp(32), None
-                    halign: "left"
+                BoxLayout:
+                    orientation: "vertical"
+                    spacing: dp(2)
 
-            StyledCard:
-                orientation: "vertical"
+                    Label:
+                        text: "Website"
+                        font_size: sp(16)
+                        bold: True
+                        color: 0.2, 0.2, 0.2, 1
+                        text_size: self.size
+                        halign: "left"
+                        valign: "bottom"
+
+                    Label:
+                        text: "guillermodotn.github.io/apno"
+                        font_size: sp(12)
+                        color: 0.5, 0.5, 0.5, 1
+                        text_size: self.size
+                        halign: "left"
+                        valign: "top"
+
+            ClickableCard:
+                orientation: "horizontal"
                 size_hint_y: None
-                height: dp(100)
-                spacing: dp(4)
+                height: dp(64)
+                spacing: dp(12)
+                on_release: root.open_github()
 
                 Label:
-                    text: "CO2 Tables"
-                    font_size: sp(16)
-                    bold: True
-                    color: 0.9, 0.5, 0.2, 1
-                    size_hint_y: None
-                    height: dp(24)
-                    text_size: self.size
-                    halign: "left"
-                    valign: "middle"
+                    text: root.icon_github
+                    font_name: "Icons"
+                    font_size: sp(28)
+                    color: 0.2, 0.2, 0.2, 1
+                    size_hint_x: None
+                    width: dp(32)
 
-                Label:
-                    text: "Increasing hold with fixed rest. Builds CO2 tolerance."
-                    font_size: sp(14)
-                    color: 0.4, 0.4, 0.4, 1
-                    text_size: self.width - dp(32), None
-                    halign: "left"
+                BoxLayout:
+                    orientation: "vertical"
+                    spacing: dp(2)
+
+                    Label:
+                        text: "Source Code"
+                        font_size: sp(16)
+                        bold: True
+                        color: 0.2, 0.2, 0.2, 1
+                        text_size: self.size
+                        halign: "left"
+                        valign: "bottom"
+
+                    Label:
+                        text: "guillermodotn/apno"
+                        font_size: sp(12)
+                        color: 0.5, 0.5, 0.5, 1
+                        text_size: self.size
+                        halign: "left"
+                        valign: "top"
 
             Widget:
                 size_hint_y: None
@@ -164,6 +182,13 @@ Builder.load_string("""
 
 class AboutScreen(Screen):
     version_text = StringProperty(f"Version {__version__}")
+    description_text = StringProperty(
+        "Open-source apnea training for freedivers,"
+        " spearfishers, and anyone looking to improve"
+        " their breath-hold capacity."
+    )
+    icon_web = StringProperty(icon("web"))
+    icon_github = StringProperty(icon("github"))
     icon_alert = StringProperty(icon("alert"))
     safety_text = StringProperty(
         "• Never practice in water alone\n"
@@ -173,3 +198,9 @@ class AboutScreen(Screen):
         "• Never hyperventilate\n"
         "• Progress gradually"
     )
+
+    def open_website(self):
+        webbrowser.open(WEBSITE_URL)
+
+    def open_github(self):
+        webbrowser.open(GITHUB_URL)

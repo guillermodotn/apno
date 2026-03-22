@@ -22,6 +22,9 @@ ICONS = {
     "plus": "\U000f0415",
     "minus": "\U000f0374",
     "check": "\U000f012c",
+    # Links
+    "web": "\U000f059f",
+    "github": "\U000f02a4",
     # Status
     "alert": "\U000f0026",
     "heart-pulse": "\U000f5f6c",
