@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ if not .IsHome }}{{ .Title }} | {{ end }}{{ .Site.Title }}</title>
   <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
-  <link rel="icon" type="image/svg+xml" href="/images/logo.svg">
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="{{ "images/logo.svg" | relURL }}">
+  <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
 </head>
 <body>
   <header class="site-header">
     <nav>
-      <a href="/" class="nav-logo">
-        <img src="/images/logo.svg" alt="Apno" width="32" height="32">
+      <a href="{{ "" | relURL }}" class="nav-logo">
+        <img src="{{ "images/logo.svg" | relURL }}" alt="Apno" width="32" height="32">
         <span>Apno</span>
       </a>
       <div class="nav-links">
-        <a href="/changelog/">Changelog</a>
-        <a href="/privacy/">Privacy</a>
+        <a href="{{ "changelog/" | relURL }}">Changelog</a>
+        <a href="{{ "privacy/" | relURL }}">Privacy</a>
         <a href="{{ .Site.Params.githubURL }}" target="_blank" rel="noopener">GitHub</a>
       </div>
     </nav>
@@ -28,7 +28,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>&copy; {{ now.Year }} Apno &middot; <a href="/privacy/">Privacy Policy</a> &middot; <a href="{{ .Site.Params.githubURL }}" target="_blank" rel="noopener">Source</a></p>
+    <p>&copy; {{ now.Year }} Apno &middot; <a href="{{ "privacy/" | relURL }}">Privacy Policy</a> &middot; <a href="{{ .Site.Params.githubURL }}" target="_blank" rel="noopener">Source</a></p>
   </footer>
 </body>
 </html>

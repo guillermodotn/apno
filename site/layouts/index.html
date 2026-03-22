@@ -1,7 +1,7 @@
 {{ define "main" }}
 <section class="hero">
   <div class="hero-content">
-    <img src="/images/logo.svg" alt="Apno" class="hero-logo">
+    <img src="{{ "images/logo.svg" | relURL }}" alt="Apno" class="hero-logo">
     <h1>Apno</h1>
     <p class="hero-tagline">Train your breath. Expand your limits.</p>
     <p class="hero-description">
@@ -45,19 +45,19 @@
   <h2>Screenshots</h2>
   <div class="screenshot-gallery">
     <figure>
-      <img src="/screenshots/home_2.png" alt="Home screen with training heatmap" loading="lazy">
+      <img src="{{ "screenshots/home_2.png" | relURL }}" alt="Home screen with training heatmap" loading="lazy">
     </figure>
     <figure>
-      <img src="/screenshots/o2_2.png" alt="O2 table training in progress" loading="lazy">
+      <img src="{{ "screenshots/o2_2.png" | relURL }}" alt="O2 table training in progress" loading="lazy">
     </figure>
     <figure>
-      <img src="/screenshots/co2_2.png" alt="CO2 table training in progress" loading="lazy">
+      <img src="{{ "screenshots/co2_2.png" | relURL }}" alt="CO2 table training in progress" loading="lazy">
     </figure>
     <figure>
-      <img src="/screenshots/free_2.png" alt="Free training with active hold" loading="lazy">
+      <img src="{{ "screenshots/free_2.png" | relURL }}" alt="Free training with active hold" loading="lazy">
     </figure>
     <figure>
-      <img src="/screenshots/history_1.png" alt="Training session history" loading="lazy">
+      <img src="{{ "screenshots/history_1.png" | relURL }}" alt="Training session history" loading="lazy">
     </figure>
   </div>
 </section>
