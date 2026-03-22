@@ -8,7 +8,7 @@ on:
       track:
         description: "Release track"
         required: true
-        default: "alpha"
+        default: "beta"
         type: choice
         options:
           - alpha
@@ -135,7 +135,7 @@ jobs:
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             TRACK="${{ github.event.inputs.track }}"
           else
-            TRACK="alpha"
+            TRACK="beta"
           fi
           echo "track=$TRACK" >> $GITHUB_OUTPUT
 
