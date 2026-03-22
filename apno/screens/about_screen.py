@@ -2,6 +2,7 @@ from kivy.lang import Builder
 from kivy.properties import StringProperty
 from kivy.uix.screenmanager import Screen
 
+from apno import __version__
 from apno.utils.icons import icon
 
 Builder.load_string("""
@@ -30,7 +31,7 @@ Builder.load_string("""
                 height: dp(40)
 
             Label:
-                text: "Version 0.1.0"
+                text: root.version_text
                 font_size: sp(14)
                 color: 0.5, 0.5, 0.5, 1
                 size_hint_y: None
@@ -162,6 +163,7 @@ Builder.load_string("""
 
 
 class AboutScreen(Screen):
+    version_text = StringProperty(f"Version {__version__}")
     icon_alert = StringProperty(icon("alert"))
     safety_text = StringProperty(
         "• Never practice in water alone\n"

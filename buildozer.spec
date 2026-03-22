@@ -22,7 +22,7 @@ source.exclude_exts = spec
 source.exclude_dirs = tests,.github,.venv,build,dist,__pycache__,.git,.ruff_cache,.buildozer,bin,scripts
 
 # Application versioning
-version = 0.1.0
+version = 0.2.0
 
 # Application requirements (comma-separated)
 requirements = python3,kivy==2.3.0,pillow
@@ -37,7 +37,7 @@ fullscreen = 0
 android.permissions = INTERNET
 
 # Android API to use for the build
-android.api = 34
+android.api = 35
 
 # Minimum Android API level
 android.minapi = 21
@@ -74,7 +74,7 @@ android.keystore = release.keystore
 android.keystorealias = apno
 
 # Version code (will be overridden in CI with GitHub run number)
-android.version.code = 100
+android.version.code = 200
 
 [buildozer]
 

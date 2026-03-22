@@ -19,7 +19,7 @@ release = [
 
 [project]
 name = "apno"
-version = "0.1.0"
+version = "0.2.0"
 description = "Apnea training app."
 authors = [
   {name = "guillermodotn", email = "guillerm0.n@outlook.es"}
@@ -33,6 +33,16 @@ dependencies = [
 
 [project.scripts]
 apno = "apno.app:main"
+
+[tool.apno]
+version_file = "apno/__init__.py"
+version_variable = "__version__"
+version_source = "tag"
+tag_format = "v{version}"
+
+[tool.apno.release]
+package_name = "io.github.guillermodotn.apno"
+track = "alpha"
 
 [tool.hatch.build.targets.wheel]
 packages = ["apno"]
@@ -61,13 +71,3 @@ select = [
 combine-as-imports = true
 known-third-party = ["kivy"]
 section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
-
-[tool.apno]
-version_file = "apno/__init__.py"
-version_variable = "__version__"
-version_source = "tag"
-tag_format = "v{version}"
-
-[tool.apno.release]
-package_name = "io.github.guillermodotn.apno"
-track = "alpha"

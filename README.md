@@ -53,3 +53,29 @@ uv run ruff check .
 uv run ruff format .
 ```
 
+### Versioning
+
+The single source of truth for the app version is `apno/__init__.py`:
+
+```python
+__version__ = "0.2.0"
+```
+
+The version script updates all files that reference it (`apno/__init__.py`,
+`pyproject.toml`, `buildozer.spec`):
+
+```bash
+# Get current version
+python scripts/version.py get
+
+# Set a specific version
+python scripts/version.py set 0.3.0
+
+# Bump patch/minor/major
+python scripts/version.py bump patch
+python scripts/version.py bump minor
+python scripts/version.py bump major
+```
+
+After bumping, run `uv lock` to sync the lockfile.
+
