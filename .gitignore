@@ -145,7 +145,7 @@ venv.bak/
 .ropeproject
 
 # mkdocs documentation
-/site
+# /site  # removed: site/ is used for Hugo landing page
 
 # mypy
 .mypy_cache/
@@ -183,3 +183,8 @@ apno.db
 
 # Local env overrides (keep .env.development in repo as template)
 .env.local
+
+# Hugo build output
+site/public/
+site/resources/
+site/.hugo_build.lock

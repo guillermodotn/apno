@@ -1,0 +1,11 @@
+baseURL = "https://apno.pages.dev"
+languageCode = "en"
+title = "Apno"
+
+[markup.goldmark.renderer]
+unsafe = true
+
+[params]
+description = "A cross-platform apnea and breath-holding training app"
+playStoreURL = "https://play.google.com/store/apps/details?id=io.github.guillermodotn.apno"
+githubURL = "https://github.com/guillermodotn/apno"
