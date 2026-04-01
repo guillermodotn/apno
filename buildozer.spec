@@ -34,7 +34,7 @@ orientation = portrait
 fullscreen = 0
 
 # Permissions required by the app
-android.permissions = INTERNET
+# android.permissions = INTERNET
 
 # Android API to use for the build
 android.api = 35
