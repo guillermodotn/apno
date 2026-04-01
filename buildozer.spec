@@ -74,7 +74,7 @@ android.logcat_filters = *:S python:D
 android.keystore = release.keystore
 android.keystorealias = apno
 
-# Version code (will be overridden in CI with GitHub run number)
+# Version code (overridden in CD with github.run_number + 200)
 android.version.code = 200
 
 [buildozer]

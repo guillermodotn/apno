@@ -41,10 +41,10 @@ jobs:
           restore-keys: |
             buildozer-apk-${{ runner.os }}-
 
-      - name: Clean corrupted p4a cache
+      - name: Set version code
         run: |
-          rm -rf .buildozer/android/platform/python-for-android
-          rm -rf ~/.buildozer/android/platform/python-for-android
+          VERSION_CODE=$(( ${{ github.run_number }} + 200 ))
+          sed -i "s/^android.version.code = .*/android.version.code = $VERSION_CODE/" buildozer.spec
 
       - name: Build APK
         run: |
@@ -88,10 +88,10 @@ jobs:
           restore-keys: |
             buildozer-aab-${{ runner.os }}-
 
-      - name: Clean corrupted p4a cache
+      - name: Set version code
         run: |
-          rm -rf .buildozer/android/platform/python-for-android
-          rm -rf ~/.buildozer/android/platform/python-for-android
+          VERSION_CODE=$(( ${{ github.run_number }} + 200 ))
+          sed -i "s/^android.version.code = .*/android.version.code = $VERSION_CODE/" buildozer.spec
 
       - name: Build AAB
         env:
