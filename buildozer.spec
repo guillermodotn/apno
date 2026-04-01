@@ -1,4 +1,4 @@
-]
+[app]
 
 # Title of your application
 title = Apno
@@ -22,7 +22,7 @@ source.exclude_exts = spec
 source.exclude_dirs = tests,.github,.venv,build,dist,__pycache__,.git,.ruff_cache,.buildozer,bin,scripts
 
 # Application versioning
-version = 0.2.0
+version = 0.2.1
 
 # Application requirements (comma-separated)
 requirements = python3,kivy==2.3.0,pillow
@@ -73,9 +73,6 @@ android.logcat_filters = *:S python:D
 # Android keystore for signing release builds
 android.keystore = release.keystore
 android.keystorealias = apno
-
-# Version code (overridden in CD with github.run_number + 200)
-android.version.code = 201
 
 [buildozer]
 

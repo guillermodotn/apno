@@ -46,11 +46,6 @@ jobs:
           restore-keys: |
             buildozer-global-${{ runner.os }}-
 
-      - name: Set version code
-        run: |
-          VERSION_CODE=$(( ${{ github.run_number }} + 200 ))
-          sed -i "s/^android.version.code = .*/android.version.code = $VERSION_CODE/" buildozer.spec
-
       - name: Build AAB
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
