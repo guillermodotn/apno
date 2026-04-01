@@ -64,7 +64,7 @@ Builder.load_string("""
             ClickableCard:
                 orientation: "horizontal"
                 size_hint_y: None
-                height: dp(64)
+                height: dp(72)
                 spacing: dp(12)
                 on_release: root.open_website()
 
@@ -85,6 +85,8 @@ Builder.load_string("""
                         font_size: sp(16)
                         bold: True
                         color: 0.2, 0.2, 0.2, 1
+                        size_hint_y: None
+                        height: sp(22)
                         text_size: self.size
                         halign: "left"
                         valign: "bottom"
@@ -93,6 +95,8 @@ Builder.load_string("""
                         text: "guillermodotn.github.io/apno"
                         font_size: sp(12)
                         color: 0.5, 0.5, 0.5, 1
+                        size_hint_y: None
+                        height: sp(18)
                         text_size: self.size
                         halign: "left"
                         valign: "top"
@@ -100,7 +104,7 @@ Builder.load_string("""
             ClickableCard:
                 orientation: "horizontal"
                 size_hint_y: None
-                height: dp(64)
+                height: dp(72)
                 spacing: dp(12)
                 on_release: root.open_github()
 
@@ -121,6 +125,8 @@ Builder.load_string("""
                         font_size: sp(16)
                         bold: True
                         color: 0.2, 0.2, 0.2, 1
+                        size_hint_y: None
+                        height: sp(22)
                         text_size: self.size
                         halign: "left"
                         valign: "bottom"
@@ -129,6 +135,8 @@ Builder.load_string("""
                         text: "guillermodotn/apno"
                         font_size: sp(12)
                         color: 0.5, 0.5, 0.5, 1
+                        size_hint_y: None
+                        height: sp(18)
                         text_size: self.size
                         halign: "left"
                         valign: "top"
