@@ -45,8 +45,8 @@ android.minapi = 21
 # Android NDK version
 android.ndk = 25b
 
-# Android architectures to build for
-android.archs = arm64-v8a,armeabi-v7a
+# Android architectures to build for (arm64 only, 99%+ of active devices)
+android.archs = arm64-v8a
 
 # Enable AndroidX support
 android.enable_androidx = True
