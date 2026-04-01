@@ -46,6 +46,11 @@ jobs:
           VERSION_CODE=$(( ${{ github.run_number }} + 200 ))
           sed -i "s/^android.version.code = .*/android.version.code = $VERSION_CODE/" buildozer.spec
 
+      - name: Clean p4a cache
+        run: |
+          rm -rf .buildozer/android/platform/python-for-android
+          rm -rf ~/.buildozer/android/platform/python-for-android
+
       - name: Build APK
         run: |
           docker run --rm \
@@ -92,6 +97,11 @@ jobs:
         run: |
           VERSION_CODE=$(( ${{ github.run_number }} + 200 ))
           sed -i "s/^android.version.code = .*/android.version.code = $VERSION_CODE/" buildozer.spec
+
+      - name: Clean p4a cache
+        run: |
+          rm -rf .buildozer/android/platform/python-for-android
+          rm -rf ~/.buildozer/android/platform/python-for-android
 
       - name: Build AAB
         env:
