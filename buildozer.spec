@@ -1,4 +1,4 @@
-[app]
+]
 
 # Title of your application
 title = Apno
@@ -75,7 +75,7 @@ android.keystore = release.keystore
 android.keystorealias = apno
 
 # Version code (overridden in CD with github.run_number + 200)
-android.version.code = 200
+android.version.code = 201
 
 [buildozer]
 
