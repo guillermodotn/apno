@@ -54,7 +54,8 @@ android.enable_androidx = True
 # Android app theme
 android.apptheme = @android:style/Theme.NoTitleBar
 
-# Presplash color (hex or color name)
+# Presplash image and background color
+presplash.filename = %(source.dir)s/apno/assets/images/logo.png
 android.presplash_color = #FFFFFF
 
 # Icon of the application (512x512 square)
