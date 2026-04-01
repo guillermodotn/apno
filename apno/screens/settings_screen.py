@@ -1,6 +1,6 @@
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.properties import NumericProperty, StringProperty
+from kivy.properties import BooleanProperty, NumericProperty, StringProperty
 from kivy.uix.screenmanager import Screen
 
 Builder.load_string("""
@@ -246,11 +246,14 @@ Builder.load_string("""
             StyledCard:
                 orientation: "vertical"
                 size_hint_y: None
-                height: dp(70)
+                height: self.minimum_height
                 padding: dp(16), dp(12)
+                spacing: 0
 
                 BoxLayout:
                     orientation: "horizontal"
+                    size_hint_y: None
+                    height: dp(48)
 
                     Label:
                         text: "Rounds"
@@ -298,6 +301,28 @@ Builder.load_string("""
                             color: 0.3, 0.3, 0.3, 1
                             on_release: root.increase_rounds()
 
+                Divider:
+
+                BoxLayout:
+                    orientation: "horizontal"
+                    size_hint_y: None
+                    height: dp(48)
+
+                    Label:
+                        text: "Keep screen on"
+                        font_size: sp(14)
+                        color: 0.2, 0.2, 0.2, 1
+                        text_size: self.size
+                        halign: "left"
+                        valign: "middle"
+
+                    CheckBox:
+                        active: root.keep_screen_on
+                        on_active: root.keep_screen_on = self.active
+                        size_hint_x: None
+                        width: dp(48)
+                        color: 0.15, 0.40, 0.65, 1
+
             # Reset Button
             OutlinedButton:
                 text: "Reset to Defaults"
@@ -324,6 +349,7 @@ class SettingsScreen(Screen):
 
     # General settings
     total_rounds = NumericProperty(8)
+    keep_screen_on = BooleanProperty(True)
 
     # Summaries
     o2_summary = StringProperty("")
@@ -410,6 +436,7 @@ class SettingsScreen(Screen):
         self.co2_hold_increment = 15
         self.co2_rest_time = 120
         self.total_rounds = 8
+        self.keep_screen_on = True
         self._update_summaries()
         self._apply_settings()
 
