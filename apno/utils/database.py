@@ -104,6 +104,12 @@ def init_db():
             CREATE INDEX IF NOT EXISTS idx_contractions_session_id
             ON contractions (session_id)
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            )
+        """)
         conn.commit()
     finally:
         conn.close()
@@ -406,6 +412,56 @@ def get_contraction_count_for_session(session_id: int) -> int:
         )
         row = cursor.fetchone()
         return row["count"] if row else 0
+    finally:
+        conn.close()
+
+
+def save_setting(key: str, value: str) -> None:
+    """Save a single setting to the database.
+
+    Args:
+        key: Setting key
+        value: Setting value as string
+    """
+    conn = get_connection()
+    try:
+        conn.execute(
+            "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
+            (key, value),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def save_settings(settings: dict[str, str]) -> None:
+    """Save multiple settings to the database.
+
+    Args:
+        settings: Dictionary of key-value pairs
+    """
+    conn = get_connection()
+    try:
+        for key, value in settings.items():
+            conn.execute(
+                "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
+                (key, str(value)),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def load_settings() -> dict[str, str]:
+    """Load all settings from the database.
+
+    Returns:
+        Dictionary of key-value pairs
+    """
+    conn = get_connection()
+    try:
+        cursor = conn.execute("SELECT key, value FROM settings")
+        return {row["key"]: row["value"] for row in cursor.fetchall()}
     finally:
         conn.close()
 

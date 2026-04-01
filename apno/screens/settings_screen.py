@@ -3,6 +3,8 @@ from kivy.lang import Builder
 from kivy.properties import BooleanProperty, NumericProperty, StringProperty
 from kivy.uix.screenmanager import Screen
 
+from apno.utils.database import load_settings, save_settings
+
 Builder.load_string("""
 #:import StyledCard apno.widgets.styled_card.StyledCard
 #:import OutlinedButton apno.widgets.styled_button.OutlinedButton
@@ -67,6 +69,62 @@ Builder.load_string("""
             background_color: 0.92, 0.92, 0.92, 1
             color: 0.3, 0.3, 0.3, 1
             on_release: root.setting_value = min(root.max_value, root.setting_value + root.step_value)
+
+
+<RoundsStepper@BoxLayout>:
+    orientation: "horizontal"
+    size_hint_y: None
+    height: dp(48)
+    rounds_value: 8
+    min_rounds: 4
+    max_rounds: 12
+    accent_color: 0.15, 0.40, 0.65, 1
+
+    Label:
+        text: "Rounds"
+        font_size: sp(14)
+        color: 0.2, 0.2, 0.2, 1
+        text_size: self.size
+        halign: "left"
+        valign: "middle"
+
+    BoxLayout:
+        size_hint_x: None
+        width: dp(130)
+        spacing: dp(12)
+
+        Button:
+            text: "−"
+            font_size: sp(20)
+            bold: True
+            size_hint: None, None
+            size: dp(36), dp(36)
+            pos_hint: {"center_y": 0.5}
+            background_normal: ""
+            background_color: 0.92, 0.92, 0.92, 1
+            color: 0.3, 0.3, 0.3, 1
+            on_release: root.rounds_value = max(root.min_rounds, root.rounds_value - 1)
+
+        Label:
+            text: str(int(root.rounds_value))
+            font_size: sp(18)
+            bold: True
+            color: root.accent_color
+            size_hint_x: None
+            width: dp(30)
+            halign: "center"
+
+        Button:
+            text: "+"
+            font_size: sp(20)
+            bold: True
+            size_hint: None, None
+            size: dp(36), dp(36)
+            pos_hint: {"center_y": 0.5}
+            background_normal: ""
+            background_color: 0.92, 0.92, 0.92, 1
+            color: 0.3, 0.3, 0.3, 1
+            on_release: root.rounds_value = min(root.max_rounds, root.rounds_value + 1)
 
 
 <SectionHeader@BoxLayout>:
@@ -167,6 +225,13 @@ Builder.load_string("""
 
                 Divider:
 
+                RoundsStepper:
+                    rounds_value: root.o2_rounds
+                    accent_color: 0.25, 0.45, 0.85, 1
+                    on_rounds_value: root.update_o2_rounds(self.rounds_value)
+
+                Divider:
+
                 BoxLayout:
                     size_hint_y: None
                     height: dp(40)
@@ -225,6 +290,13 @@ Builder.load_string("""
 
                 Divider:
 
+                RoundsStepper:
+                    rounds_value: root.co2_rounds
+                    accent_color: 1.0, 0.7, 0.2, 1
+                    on_rounds_value: root.update_co2_rounds(self.rounds_value)
+
+                Divider:
+
                 BoxLayout:
                     size_hint_y: None
                     height: dp(40)
@@ -249,59 +321,6 @@ Builder.load_string("""
                 height: self.minimum_height
                 padding: dp(16), dp(12)
                 spacing: 0
-
-                BoxLayout:
-                    orientation: "horizontal"
-                    size_hint_y: None
-                    height: dp(48)
-
-                    Label:
-                        text: "Rounds"
-                        font_size: sp(14)
-                        color: 0.2, 0.2, 0.2, 1
-                        text_size: self.size
-                        halign: "left"
-                        valign: "middle"
-
-                    BoxLayout:
-                        size_hint_x: None
-                        width: dp(130)
-                        spacing: dp(12)
-
-                        Button:
-                            text: "−"
-                            font_size: sp(20)
-                            bold: True
-                            size_hint: None, None
-                            size: dp(36), dp(36)
-                            pos_hint: {"center_y": 0.5}
-                            background_normal: ""
-                            background_color: 0.92, 0.92, 0.92, 1
-                            color: 0.3, 0.3, 0.3, 1
-                            on_release: root.decrease_rounds()
-
-                        Label:
-                            text: str(root.total_rounds)
-                            font_size: sp(18)
-                            bold: True
-                            color: 0.15, 0.40, 0.65, 1
-                            size_hint_x: None
-                            width: dp(30)
-                            halign: "center"
-
-                        Button:
-                            text: "+"
-                            font_size: sp(20)
-                            bold: True
-                            size_hint: None, None
-                            size: dp(36), dp(36)
-                            pos_hint: {"center_y": 0.5}
-                            background_normal: ""
-                            background_color: 0.92, 0.92, 0.92, 1
-                            color: 0.3, 0.3, 0.3, 1
-                            on_release: root.increase_rounds()
-
-                Divider:
 
                 BoxLayout:
                     orientation: "horizontal"
@@ -341,28 +360,44 @@ class SettingsScreen(Screen):
     o2_hold_time = NumericProperty(120)  # 2 minutes
     o2_initial_rest = NumericProperty(120)  # 2 minutes
     o2_rest_decrement = NumericProperty(15)  # 15 seconds
+    o2_rounds = NumericProperty(8)
 
     # CO2 Table settings
     co2_initial_hold = NumericProperty(60)  # 1 minute
     co2_hold_increment = NumericProperty(15)  # 15 seconds
     co2_rest_time = NumericProperty(120)  # 2 minutes
+    co2_rounds = NumericProperty(8)
 
     # General settings
-    total_rounds = NumericProperty(8)
     keep_screen_on = BooleanProperty(True)
 
     # Summaries
     o2_summary = StringProperty("")
     co2_summary = StringProperty("")
 
+    # Setting keys for database persistence
+    _setting_keys = {
+        "o2_hold_time": float,
+        "o2_initial_rest": float,
+        "o2_rest_decrement": float,
+        "o2_rounds": float,
+        "co2_initial_hold": float,
+        "co2_hold_increment": float,
+        "co2_rest_time": float,
+        "co2_rounds": float,
+        "keep_screen_on": lambda v: v == "True",
+    }
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self._loading = True
+        self._load_from_db()
+        self._loading = False
         self._update_summaries()
 
-    def on_total_rounds(self, instance, value):
-        """Auto-apply when rounds change."""
-        self._update_summaries()
-        self._apply_settings()
+    def on_keep_screen_on(self, instance, value):
+        """Auto-save when keep_screen_on changes."""
+        self._save_to_db()
 
     def _format_time(self, seconds):
         """Format seconds as M:SS."""
@@ -373,19 +408,21 @@ class SettingsScreen(Screen):
         """Update the training summary text."""
         # O2 summary: fixed hold, decreasing rest
         final_rest = max(
-            15, self.o2_initial_rest - (self.total_rounds - 1) * self.o2_rest_decrement
+            15,
+            self.o2_initial_rest - (self.o2_rounds - 1) * self.o2_rest_decrement,
         )
         self.o2_summary = (
-            f"{self.total_rounds} rounds: {self._format_time(self.o2_hold_time)} hold, "
+            f"{int(self.o2_rounds)} rounds: "
+            f"{self._format_time(self.o2_hold_time)} hold, "
             f"rest {self._format_time(self.o2_initial_rest)} → {self._format_time(final_rest)}"  # noqa E501
         )
 
         # CO2 summary: increasing hold, fixed rest
         final_hold = (
-            self.co2_initial_hold + (self.total_rounds - 1) * self.co2_hold_increment
+            self.co2_initial_hold + (self.co2_rounds - 1) * self.co2_hold_increment
         )
         self.co2_summary = (
-            f"{self.total_rounds} rounds: hold {self._format_time(self.co2_initial_hold)} → "  # noqa E501
+            f"{int(self.co2_rounds)} rounds: hold {self._format_time(self.co2_initial_hold)} → "  # noqa E501
             f"{self._format_time(final_hold)}, {self._format_time(self.co2_rest_time)} rest"  # noqa E501
         )
 
@@ -404,6 +441,11 @@ class SettingsScreen(Screen):
         self._update_summaries()
         self._apply_settings()
 
+    def update_o2_rounds(self, value):
+        self.o2_rounds = value
+        self._update_summaries()
+        self._apply_settings()
+
     def update_co2_hold(self, value):
         self.co2_initial_hold = value
         self._update_summaries()
@@ -419,29 +461,49 @@ class SettingsScreen(Screen):
         self._update_summaries()
         self._apply_settings()
 
-    def increase_rounds(self):
-        if self.total_rounds < 12:
-            self.total_rounds += 1
-
-    def decrease_rounds(self):
-        if self.total_rounds > 4:
-            self.total_rounds -= 1
+    def update_co2_rounds(self, value):
+        self.co2_rounds = value
+        self._update_summaries()
+        self._apply_settings()
 
     def reset_defaults(self):
         """Reset all settings to defaults."""
         self.o2_hold_time = 120
         self.o2_initial_rest = 120
         self.o2_rest_decrement = 15
+        self.o2_rounds = 8
         self.co2_initial_hold = 60
         self.co2_hold_increment = 15
         self.co2_rest_time = 120
-        self.total_rounds = 8
+        self.co2_rounds = 8
         self.keep_screen_on = True
         self._update_summaries()
         self._apply_settings()
 
+    def _load_from_db(self):
+        """Load saved settings from the database."""
+        try:
+            saved = load_settings()
+            for key, converter in self._setting_keys.items():
+                if key in saved:
+                    setattr(self, key, converter(saved[key]))
+        except Exception:
+            pass  # Use defaults if loading fails
+
+    def _save_to_db(self):
+        """Save current settings to the database."""
+        if self._loading:
+            return
+        try:
+            settings = {key: str(getattr(self, key)) for key in self._setting_keys}
+            save_settings(settings)
+        except Exception:
+            pass  # Silently fail on save errors
+
     def _apply_settings(self):
-        """Apply settings to the training screens."""
+        """Apply settings to the training screens and persist to database."""
+        self._save_to_db()
+
         app = App.get_running_app()
         if not app or not app.root:
             return
@@ -454,13 +516,13 @@ class SettingsScreen(Screen):
             o2_screen.hold_time = int(self.o2_hold_time)
             o2_screen.initial_rest_time = int(self.o2_initial_rest)
             o2_screen.rest_decrement = int(self.o2_rest_decrement)
-            o2_screen.total_rounds = self.total_rounds
+            o2_screen.total_rounds = int(self.o2_rounds)
 
             # Apply CO2 settings
             co2_screen = screen_manager.get_screen("co2_screen")
             co2_screen.initial_hold_time = int(self.co2_initial_hold)
             co2_screen.hold_increment = int(self.co2_hold_increment)
             co2_screen.rest_time = int(self.co2_rest_time)
-            co2_screen.total_rounds = self.total_rounds
+            co2_screen.total_rounds = int(self.co2_rounds)
         except Exception:
             pass  # Settings will apply when screens are available
