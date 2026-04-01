@@ -30,8 +30,8 @@ requirements = python3,kivy==2.3.0,pillow
 # Supported orientations (portrait, landscape, all)
 orientation = portrait
 
-# Enable fullscreen (0 = no, 1 = yes)
-fullscreen = 0
+# Enable fullscreen (hides Android status bar)
+fullscreen = 1
 
 # Permissions required by the app
 # android.permissions = INTERNET
