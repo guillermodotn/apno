@@ -199,12 +199,12 @@ class AboutScreen(Screen):
     icon_github = StringProperty(icon("github"))
     icon_alert = StringProperty(icon("alert"))
     safety_text = StringProperty(
-        "• Never practice in water alone\n"
-        "• Train in a safe environment\n"
-        "• Stop if dizzy or unwell\n"
-        "• Consult doctor if needed\n"
-        "• Never hyperventilate\n"
-        "• Progress gradually"
+        "- Never practice in water alone\n"
+        "- Train in a safe environment\n"
+        "- Stop if dizzy or unwell\n"
+        "- Consult doctor if needed\n"
+        "- Never hyperventilate\n"
+        "- Progress gradually"
     )
 
     def open_website(self):

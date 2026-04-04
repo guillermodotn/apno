@@ -202,7 +202,7 @@ class HistoryScreen(Screen):
             details_str = rounds_str
             if contractions_str:
                 details_str = (
-                    f"{rounds_str} • {contractions_str}"
+                    f"{rounds_str} | {contractions_str}"
                     if rounds_str
                     else contractions_str
                 )

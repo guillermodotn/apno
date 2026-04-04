@@ -28,8 +28,6 @@ ICONS = {
     # Status
     "alert": "\U000f0026",
     "heart-pulse": "\U000f5f6c",
-    # Settings
-    "cellphone-screenshot": "\U000f0a35",
 }
 
 
