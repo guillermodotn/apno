@@ -207,6 +207,12 @@ class HistoryScreen(Screen):
                     else contractions_str
                 )
 
+            # Dim incomplete sessions
+            completed = session.get("completed", 1)
+            if not completed:
+                date_str += " (incomplete)"
+                info["color"] = [c * 0.5 for c in info["color"][:3]] + [0.5]
+
             entry = Builder.load_string(f"""
 HistoryEntry:
     training_type: "{info["name"]}"
