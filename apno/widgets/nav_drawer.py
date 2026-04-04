@@ -88,6 +88,11 @@ Builder.load_string("""
         text: "Free Training"
         on_release: root.nav_to("free_screen", "Free Training")
 
+    NavDrawerItem:
+        icon_name: "history"
+        text: "History"
+        on_release: root.nav_to("history_screen", "History")
+
     Widget:
         size_hint_y: None
         height: dp(1)

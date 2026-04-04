@@ -25,6 +25,8 @@ ICONS = {
     # Links
     "web": "\U000f059f",
     "github": "\U000f02a4",
+    # History
+    "history": "\U000f02da",
     # Status
     "alert": "\U000f0026",
     "heart-pulse": "\U000f5f6c",
