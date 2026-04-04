@@ -1,11 +1,12 @@
 import os
 
-# something
 import kivy
 from kivy.app import App
 from kivy.core.text import LabelBase
 from kivy.core.window import Window
 from kivy.utils import platform
+
+from apno.utils.audio import load_sounds
 
 kivy.require("2.3.0")
 
@@ -30,6 +31,8 @@ class Apno(App):
         Window.clearcolor = (0.97, 0.98, 1.0, 1)
         # Bind keyboard events for back button handling
         Window.bind(on_keyboard=self._on_keyboard)
+        # Preload sound effects
+        load_sounds()
 
     def _on_keyboard(self, window, key, scancode, codepoint, modifier):
         """Handle Android/iOS back button and ESC key.

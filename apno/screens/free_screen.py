@@ -4,6 +4,7 @@ from kivy.lang import Builder
 from kivy.properties import BooleanProperty, NumericProperty, StringProperty
 from kivy.uix.screenmanager import Screen
 
+from apno.utils import audio
 from apno.utils.database import (
     get_best_score,
     save_contraction,
@@ -219,6 +220,7 @@ class FreeScreen(Screen):
 
     def _start_hold(self):
         """Begin a breath hold."""
+        audio.play("hold_start")
         self.phase = "hold"
         self.is_holding = True
         self.elapsed_time = 0
@@ -236,11 +238,13 @@ class FreeScreen(Screen):
         """Record a contraction during the current hold."""
         if not self.is_holding:
             return
+        audio.play("contraction_tap")
         self.contractions.append(self.elapsed_time)
         self.contraction_count = len(self.contractions)
 
     def _end_hold(self):
         """End the current breath hold."""
+        audio.play("rest_start")
         self._stop_timer()
         self.phase = "ready"
         self.is_holding = False

@@ -9,6 +9,7 @@ from kivy.properties import (
 )
 from kivy.uix.screenmanager import Screen
 
+from apno.utils import audio
 from apno.utils.database import save_practice_session
 from apno.utils.screen import set_keep_screen_on
 
@@ -319,18 +320,25 @@ class CO2Screen(Screen):
 
         if self.time_left > 0:
             self.time_left -= 1
-            self._update_display()
-        else:
-            self._next_phase()
+            if self.time_left == 0:
+                self._next_phase()
+            else:
+                # Countdown ticks in last 5 seconds of breathe/rest phases
+                if self.phase in ("breathe", "rest") and self.time_left <= 5:
+                    audio.play("countdown_tick")
+                self._update_display()
 
     def _next_phase(self):
         """Transition to the next phase."""
         if self.phase == "breathe":
+            audio.play("hold_start")
             self._start_hold_phase()
         elif self.phase == "hold":
             if self.current_round >= self.total_rounds:
+                audio.play("session_complete")
                 self._complete_training()
             else:
+                audio.play("rest_start")
                 self._start_rest_phase()
         elif self.phase == "rest":
             self.current_round += 1
