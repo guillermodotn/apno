@@ -13,7 +13,7 @@ package.domain = io.github.guillermodotn
 source.dir = .
 
 # Source files to include
-source.include_exts = py,png,jpg,jpeg,svg,ttf,kv,json
+source.include_exts = py,png,jpg,jpeg,svg,ttf,kv,json,wav
 
 # Source files to exclude
 source.exclude_exts = spec
@@ -55,7 +55,7 @@ android.enable_androidx = True
 android.apptheme = @android:style/Theme.NoTitleBar
 
 # Presplash image and background color
-presplash.filename = %(source.dir)s/apno/assets/images/logo.png
+presplash.filename = %(source.dir)s/apno/assets/images/presplash.png
 android.presplash_color = #FFFFFF
 
 # Icon of the application (512x512 square)
