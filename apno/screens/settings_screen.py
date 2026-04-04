@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.properties import BooleanProperty, NumericProperty, StringProperty
 from kivy.uix.screenmanager import Screen
@@ -9,6 +10,7 @@ Builder.load_string("""
 #:import StyledCard apno.widgets.styled_card.StyledCard
 #:import OutlinedButton apno.widgets.styled_button.OutlinedButton
 #:import RoundedRectangle kivy.graphics.RoundedRectangle
+
 
 <SettingStepper@BoxLayout>:
     orientation: "horizontal"
@@ -38,7 +40,7 @@ Builder.load_string("""
         padding: 0
 
         Button:
-            text: "−"
+            text: "-"
             font_size: sp(20)
             bold: True
             size_hint: None, None
@@ -75,6 +77,8 @@ Builder.load_string("""
     orientation: "horizontal"
     size_hint_y: None
     height: dp(48)
+    padding: 0, dp(4)
+    spacing: dp(12)
     rounds_value: 8
     min_rounds: 4
     max_rounds: 12
@@ -87,14 +91,15 @@ Builder.load_string("""
         text_size: self.size
         halign: "left"
         valign: "middle"
+        size_hint_x: 0.45
 
     BoxLayout:
-        size_hint_x: None
-        width: dp(130)
-        spacing: dp(12)
+        size_hint_x: 0.55
+        spacing: dp(8)
+        padding: 0
 
         Button:
-            text: "−"
+            text: "-"
             font_size: sp(20)
             bold: True
             size_hint: None, None
@@ -107,11 +112,11 @@ Builder.load_string("""
 
         Label:
             text: str(int(root.rounds_value))
-            font_size: sp(18)
+            font_size: sp(16)
             bold: True
             color: root.accent_color
             size_hint_x: None
-            width: dp(30)
+            width: dp(50)
             halign: "center"
 
         Button:
@@ -166,6 +171,28 @@ Builder.load_string("""
         Rectangle:
             pos: self.x + dp(16), self.y
             size: self.width - dp(32), self.height
+
+
+<ToggleSwitch@Widget>:
+    active: False
+    active_color: 0.15, 0.40, 0.65, 1
+    size_hint: None, None
+    size: dp(48), dp(28)
+    canvas:
+        # Track
+        Color:
+            rgba: self.active_color if self.active else [0.75, 0.75, 0.75, 1]
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(14)]
+        # Knob
+        Color:
+            rgba: 1, 1, 1, 1
+        Ellipse:
+            pos: (self.x + self.width - dp(24)) if self.active else (self.x + dp(4)), self.y + dp(4)
+            size: dp(20), dp(20)
+    on_touch_down: self.active = not self.active if self.collide_point(*args[1].pos) else self.active
 
 
 <SettingsScreen>:
@@ -335,12 +362,32 @@ Builder.load_string("""
                         halign: "left"
                         valign: "middle"
 
-                    CheckBox:
+                    ToggleSwitch:
                         active: root.keep_screen_on
                         on_active: root.keep_screen_on = self.active
-                        size_hint_x: None
-                        width: dp(48)
-                        color: 0.15, 0.40, 0.65, 1
+                        pos_hint: {"center_y": 0.5}
+                        active_color: 0.15, 0.40, 0.65, 1
+
+                Divider:
+
+                BoxLayout:
+                    orientation: "horizontal"
+                    size_hint_y: None
+                    height: dp(48)
+
+                    Label:
+                        text: "Sound"
+                        font_size: sp(14)
+                        color: 0.2, 0.2, 0.2, 1
+                        text_size: self.size
+                        halign: "left"
+                        valign: "middle"
+
+                    ToggleSwitch:
+                        active: root.sound_enabled
+                        on_active: root.sound_enabled = self.active
+                        pos_hint: {"center_y": 0.5}
+                        active_color: 0.15, 0.40, 0.65, 1
 
             # Reset Button
             OutlinedButton:
@@ -370,6 +417,7 @@ class SettingsScreen(Screen):
 
     # General settings
     keep_screen_on = BooleanProperty(True)
+    sound_enabled = BooleanProperty(True)
 
     # Summaries
     o2_summary = StringProperty("")
@@ -386,6 +434,7 @@ class SettingsScreen(Screen):
         "co2_rest_time": float,
         "co2_rounds": float,
         "keep_screen_on": lambda v: v == "True",
+        "sound_enabled": lambda v: v == "True",
     }
 
     def __init__(self, **kwargs):
@@ -394,9 +443,19 @@ class SettingsScreen(Screen):
         self._load_from_db()
         self._loading = False
         self._update_summaries()
+        # Apply settings after all screens are created
+        Clock.schedule_once(lambda dt: self._apply_settings(), 0)
+
+    def on_leave(self):
+        """Re-apply settings when leaving the settings screen."""
+        self._apply_settings()
 
     def on_keep_screen_on(self, instance, value):
         """Auto-save when keep_screen_on changes."""
+        self._save_to_db()
+
+    def on_sound_enabled(self, instance, value):
+        """Auto-save when sound_enabled changes."""
         self._save_to_db()
 
     def _format_time(self, seconds):
@@ -414,7 +473,7 @@ class SettingsScreen(Screen):
         self.o2_summary = (
             f"{int(self.o2_rounds)} rounds: "
             f"{self._format_time(self.o2_hold_time)} hold, "
-            f"rest {self._format_time(self.o2_initial_rest)} → {self._format_time(final_rest)}"  # noqa E501
+            f"rest {self._format_time(self.o2_initial_rest)} to {self._format_time(final_rest)}"  # noqa E501
         )
 
         # CO2 summary: increasing hold, fixed rest
@@ -422,7 +481,7 @@ class SettingsScreen(Screen):
             self.co2_initial_hold + (self.co2_rounds - 1) * self.co2_hold_increment
         )
         self.co2_summary = (
-            f"{int(self.co2_rounds)} rounds: hold {self._format_time(self.co2_initial_hold)} → "  # noqa E501
+            f"{int(self.co2_rounds)} rounds: hold {self._format_time(self.co2_initial_hold)} to "  # noqa E501
             f"{self._format_time(final_hold)}, {self._format_time(self.co2_rest_time)} rest"  # noqa E501
         )
 
@@ -477,6 +536,7 @@ class SettingsScreen(Screen):
         self.co2_rest_time = 120
         self.co2_rounds = 8
         self.keep_screen_on = True
+        self.sound_enabled = True
         self._update_summaries()
         self._apply_settings()
 
