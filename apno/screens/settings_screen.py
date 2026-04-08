@@ -231,24 +231,24 @@ Builder.load_string("""
                 Divider:
 
                 SettingStepper:
-                    setting_label: "Initial Rest"
-                    setting_value: root.o2_initial_rest
+                    setting_label: "Initial Breathe"
+                    setting_value: root.o2_initial_breathe
                     min_value: 30
                     max_value: 300
                     step_value: 15
                     accent_color: 0.25, 0.45, 0.85, 1
-                    on_setting_value: root.update_o2_rest(self.setting_value)
+                    on_setting_value: root.update_o2_breathe(self.setting_value)
 
                 Divider:
 
                 SettingStepper:
-                    setting_label: "Rest Decrement"
-                    setting_value: root.o2_rest_decrement
+                    setting_label: "Breathe Decrement"
+                    setting_value: root.o2_breathe_decrement
                     min_value: 5
                     max_value: 30
                     step_value: 5
                     accent_color: 0.25, 0.45, 0.85, 1
-                    on_setting_value: root.update_o2_decrement(self.setting_value)
+                    on_setting_value: root.update_o2_breathe_decrement(self.setting_value)
 
                 Divider:
 
@@ -307,13 +307,13 @@ Builder.load_string("""
                 Divider:
 
                 SettingStepper:
-                    setting_label: "Rest Time"
-                    setting_value: root.co2_rest_time
+                    setting_label: "Breathe Time"
+                    setting_value: root.co2_breathe_time
                     min_value: 60
                     max_value: 300
                     step_value: 15
                     accent_color: 1.0, 0.7, 0.2, 1
-                    on_setting_value: root.update_co2_rest(self.setting_value)
+                    on_setting_value: root.update_co2_breathe(self.setting_value)
 
                 Divider:
 
@@ -405,14 +405,14 @@ Builder.load_string("""
 class SettingsScreen(Screen):
     # O2 Table settings
     o2_hold_time = NumericProperty(120)  # 2 minutes
-    o2_initial_rest = NumericProperty(120)  # 2 minutes
-    o2_rest_decrement = NumericProperty(15)  # 15 seconds
+    o2_initial_breathe = NumericProperty(120)  # 2 minutes
+    o2_breathe_decrement = NumericProperty(15)  # 15 seconds
     o2_rounds = NumericProperty(8)
 
     # CO2 Table settings
     co2_initial_hold = NumericProperty(60)  # 1 minute
     co2_hold_increment = NumericProperty(15)  # 15 seconds
-    co2_rest_time = NumericProperty(120)  # 2 minutes
+    co2_breathe_time = NumericProperty(120)  # 2 minutes
     co2_rounds = NumericProperty(8)
 
     # General settings
@@ -426,12 +426,12 @@ class SettingsScreen(Screen):
     # Setting keys for database persistence
     _setting_keys = {
         "o2_hold_time": float,
-        "o2_initial_rest": float,
-        "o2_rest_decrement": float,
+        "o2_initial_breathe": float,
+        "o2_breathe_decrement": float,
         "o2_rounds": float,
         "co2_initial_hold": float,
         "co2_hold_increment": float,
-        "co2_rest_time": float,
+        "co2_breathe_time": float,
         "co2_rounds": float,
         "keep_screen_on": lambda v: v == "True",
         "sound_enabled": lambda v: v == "True",
@@ -465,24 +465,24 @@ class SettingsScreen(Screen):
 
     def _update_summaries(self):
         """Update the training summary text."""
-        # O2 summary: fixed hold, decreasing rest
-        final_rest = max(
+        # O2 summary: fixed hold, decreasing breathe
+        final_breathe = max(
             15,
-            self.o2_initial_rest - (self.o2_rounds - 1) * self.o2_rest_decrement,
+            self.o2_initial_breathe - (self.o2_rounds - 1) * self.o2_breathe_decrement,
         )
         self.o2_summary = (
             f"{int(self.o2_rounds)} rounds: "
             f"{self._format_time(self.o2_hold_time)} hold, "
-            f"rest {self._format_time(self.o2_initial_rest)} to {self._format_time(final_rest)}"  # noqa E501
+            f"breathe {self._format_time(self.o2_initial_breathe)} to {self._format_time(final_breathe)}"  # noqa E501
         )
 
-        # CO2 summary: increasing hold, fixed rest
+        # CO2 summary: increasing hold, fixed breathe
         final_hold = (
             self.co2_initial_hold + (self.co2_rounds - 1) * self.co2_hold_increment
         )
         self.co2_summary = (
             f"{int(self.co2_rounds)} rounds: hold {self._format_time(self.co2_initial_hold)} to "  # noqa E501
-            f"{self._format_time(final_hold)}, {self._format_time(self.co2_rest_time)} rest"  # noqa E501
+            f"{self._format_time(final_hold)}, {self._format_time(self.co2_breathe_time)} breathe"  # noqa E501
         )
 
     def update_o2_hold(self, value):
@@ -490,13 +490,13 @@ class SettingsScreen(Screen):
         self._update_summaries()
         self._apply_settings()
 
-    def update_o2_rest(self, value):
-        self.o2_initial_rest = value
+    def update_o2_breathe(self, value):
+        self.o2_initial_breathe = value
         self._update_summaries()
         self._apply_settings()
 
-    def update_o2_decrement(self, value):
-        self.o2_rest_decrement = value
+    def update_o2_breathe_decrement(self, value):
+        self.o2_breathe_decrement = value
         self._update_summaries()
         self._apply_settings()
 
@@ -515,8 +515,8 @@ class SettingsScreen(Screen):
         self._update_summaries()
         self._apply_settings()
 
-    def update_co2_rest(self, value):
-        self.co2_rest_time = value
+    def update_co2_breathe(self, value):
+        self.co2_breathe_time = value
         self._update_summaries()
         self._apply_settings()
 
@@ -528,12 +528,12 @@ class SettingsScreen(Screen):
     def reset_defaults(self):
         """Reset all settings to defaults."""
         self.o2_hold_time = 120
-        self.o2_initial_rest = 120
-        self.o2_rest_decrement = 15
+        self.o2_initial_breathe = 120
+        self.o2_breathe_decrement = 15
         self.o2_rounds = 8
         self.co2_initial_hold = 60
         self.co2_hold_increment = 15
-        self.co2_rest_time = 120
+        self.co2_breathe_time = 120
         self.co2_rounds = 8
         self.keep_screen_on = True
         self.sound_enabled = True
@@ -574,15 +574,15 @@ class SettingsScreen(Screen):
             # Apply O2 settings
             o2_screen = screen_manager.get_screen("o2_screen")
             o2_screen.hold_time = int(self.o2_hold_time)
-            o2_screen.initial_rest_time = int(self.o2_initial_rest)
-            o2_screen.rest_decrement = int(self.o2_rest_decrement)
+            o2_screen.initial_breathe_time = int(self.o2_initial_breathe)
+            o2_screen.breathe_decrement = int(self.o2_breathe_decrement)
             o2_screen.total_rounds = int(self.o2_rounds)
 
             # Apply CO2 settings
             co2_screen = screen_manager.get_screen("co2_screen")
             co2_screen.initial_hold_time = int(self.co2_initial_hold)
             co2_screen.hold_increment = int(self.co2_hold_increment)
-            co2_screen.rest_time = int(self.co2_rest_time)
+            co2_screen.breathe_time = int(self.co2_breathe_time)
             co2_screen.total_rounds = int(self.co2_rounds)
         except Exception:
             pass  # Settings will apply when screens are available
