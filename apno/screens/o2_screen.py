@@ -103,9 +103,9 @@ class O2Screen(Screen):
     is_running = BooleanProperty(False)
 
     # Training parameters (in seconds)
-    hold_time = NumericProperty(120)  # 2 minutes hold (fixed for O2)
+    hold_time = NumericProperty(60)  # 1 minute hold (fixed for O2)
     initial_breathe_time = NumericProperty(120)  # Starting breathe time
-    breathe_decrement = NumericProperty(15)  # Decrease breathe by 15s each round
+    breathe_decrement = NumericProperty(10)  # Decrease breathe by 10s each round
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

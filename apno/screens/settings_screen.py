@@ -404,16 +404,16 @@ Builder.load_string("""
 
 class SettingsScreen(Screen):
     # O2 Table settings
-    o2_hold_time = NumericProperty(120)  # 2 minutes
+    o2_hold_time = NumericProperty(60)  # 1 minute
     o2_initial_breathe = NumericProperty(120)  # 2 minutes
-    o2_breathe_decrement = NumericProperty(15)  # 15 seconds
+    o2_breathe_decrement = NumericProperty(10)  # 10 seconds
     o2_rounds = NumericProperty(8)
 
     # CO2 Table settings
-    co2_initial_hold = NumericProperty(60)  # 1 minute
-    co2_hold_increment = NumericProperty(15)  # 15 seconds
+    co2_initial_hold = NumericProperty(30)  # 30 seconds
+    co2_hold_increment = NumericProperty(10)  # 10 seconds
     co2_breathe_time = NumericProperty(120)  # 2 minutes
-    co2_rounds = NumericProperty(8)
+    co2_rounds = NumericProperty(6)
 
     # General settings
     keep_screen_on = BooleanProperty(True)
@@ -527,14 +527,14 @@ class SettingsScreen(Screen):
 
     def reset_defaults(self):
         """Reset all settings to defaults."""
-        self.o2_hold_time = 120
+        self.o2_hold_time = 60
         self.o2_initial_breathe = 120
-        self.o2_breathe_decrement = 15
+        self.o2_breathe_decrement = 10
         self.o2_rounds = 8
-        self.co2_initial_hold = 60
-        self.co2_hold_increment = 15
+        self.co2_initial_hold = 30
+        self.co2_hold_increment = 10
         self.co2_breathe_time = 120
-        self.co2_rounds = 8
+        self.co2_rounds = 6
         self.keep_screen_on = True
         self.sound_enabled = True
         self._update_summaries()

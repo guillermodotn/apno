@@ -109,12 +109,12 @@ class CO2Screen(Screen):
     phase_color = ListProperty([1.0, 0.7, 0.2, 1])  # Amber
 
     current_round = NumericProperty(1)
-    total_rounds = NumericProperty(8)
+    total_rounds = NumericProperty(6)
     is_running = BooleanProperty(False)
 
     # Training parameters (in seconds)
-    initial_hold_time = NumericProperty(60)  # Start with 1 minute hold
-    hold_increment = NumericProperty(15)  # Increase hold by 15 sec each round
+    initial_hold_time = NumericProperty(30)  # Start with 30 second hold
+    hold_increment = NumericProperty(10)  # Increase hold by 10 sec each round
     breathe_time = NumericProperty(120)  # Fixed 2 minutes breathe
 
     def __init__(self, **kwargs):
