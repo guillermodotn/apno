@@ -1,8 +1,70 @@
 # Scripts
 
+## seed_database.py
+
+Populates the database with sample training sessions for development and testing. Creates a realistic training history with O2, CO2, and free training sessions spread across multiple days.
+
+### Usage
+
+```bash
+# Default: 30 days of sample data (database created in project root)
+uv run --env-file .env.development python scripts/seed_database.py
+
+# More history
+uv run --env-file .env.development python scripts/seed_database.py --days 60
+
+# Clear existing data first
+uv run --env-file .env.development python scripts/seed_database.py --clear
+
+# Different random seed for varied data
+uv run --env-file .env.development python scripts/seed_database.py --seed 123
+```
+
+The `--env-file .env.development` flag sets `APNO_DEV=1`, which places the database (`apno.db`) in the project root. Without it, the database goes to `~/.local/share/apno/apno.db`.
+
+## generate_sounds.py
+
+Generates the sonar-style WAV sound effects used during training sessions. All sounds are pure sine waves with exponential decay, generated with Python stdlib only.
+
+### Usage
+
+```bash
+python scripts/generate_sounds.py
+```
+
+### Output
+
+Sound files are written to `apno/assets/sounds/`:
+
+| File | Description |
+|------|-------------|
+| `countdown_tick.wav` | Short blip played each second before hold |
+| `hold_start.wav` | Sustained tone signaling hold phase begins |
+| `breathe_start.wav` | Low deep ping signaling breathe phase |
+| `session_complete.wav` | Triple ascending pings signaling session end |
+| `contraction_tap.wav` | Quick click for contraction acknowledgment |
+
+## version.py
+
+Updates the app version across all files from a single command.
+
+### Usage
+
+```bash
+# Set a specific version
+python scripts/version.py set 0.3.0
+
+# Bump patch/minor/major
+python scripts/version.py bump patch
+python scripts/version.py bump minor
+python scripts/version.py bump major
+```
+
+Updates `apno/__init__.py`, `pyproject.toml`, and `buildozer.spec` in one command.
+
 ## generate_screenshots.py
 
-Generates store listing screenshots by rendering the actual Kivy app headlessly using Xvfb. The screenshots are pixel-perfect captures of the real app, not mockups.
+Generates store listing screenshots by rendering the actual Kivy app headlessly using Xvfb. Uses `seed_database.py` to populate the database with sample data before capturing.
 
 ### Prerequisites
 
@@ -73,6 +135,6 @@ Existing screenshots in the output directory are replaced on each run.
 
 ### How it works
 
-1. Seeds the app database with sample training sessions (for history and heatmap screenshots).
-2. Spawns a **subprocess per device** so Kivy initializes with the correct `KIVY_METRICS_DENSITY` and `KIVY_DPI` environment variables. This is required because Kivy reads density once at import time, and phone (3x) and tablet (2x) need different values for `dp()`/`sp()` to scale correctly.
-3. Inside each subprocess: initializes the app, disables screen transition animations, navigates to each screen, optionally sets widget properties to simulate a mid-training state, then captures with `Window.screenshot()`.
+1. Seeds the app database with sample training sessions via `seed_database.py`.
+2. Spawns a subprocess per device so Kivy initializes with the correct `KIVY_METRICS_DENSITY` and `KIVY_DPI` environment variables.
+3. Inside each subprocess: initializes the app, navigates to each screen, optionally sets widget properties to simulate a mid-training state, then captures with `Window.screenshot()`.
