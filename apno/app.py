@@ -61,7 +61,12 @@ class Apno(App):
         screen_manager = self.root.ids.screen_manager
         current_screen = screen_manager.current
 
-        # If not on home screen, go back to home
+        # Session detail goes back to history
+        if current_screen == "session_detail":
+            self.change_screen("history_screen", "History")
+            return True
+
+        # All other screens go back to home
         if current_screen != "home":
             self.change_screen("home", "Apno")
             return True
