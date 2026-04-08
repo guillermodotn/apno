@@ -27,149 +27,6 @@ SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 
 
-def _seed_database():
-    """Insert sample training sessions spread across the past month.
-
-    Creates a realistic training history with sessions on ~20 of the last
-    30 days so the heatmap looks populated. Durations are kept realistic
-    (hold times between 60-120s, session totals between 8-16 minutes).
-    """
-    import json
-    import random
-    from datetime import datetime, timedelta
-
-    sys.path.insert(0, str(PROJECT_ROOT))
-    from apno.utils.database import get_connection, init_db
-
-    init_db()
-    conn = get_connection()
-
-    random.seed(42)  # deterministic so screenshots are reproducible
-    today = datetime.now()
-
-    # Pick ~20 days out of the last 30 to have sessions on
-    training_days = sorted(random.sample(range(1, 31), 20), reverse=True)
-
-    sessions = []
-    for days_ago in training_days:
-        day = today - timedelta(days=days_ago)
-
-        # Each day: 1-3 sessions mixing o2, co2, and occasionally free
-        day_types = random.choice(
-            [
-                ["o2"],
-                ["co2"],
-                ["o2", "co2"],
-                ["co2", "o2"],
-                ["o2", "free"],
-                ["co2", "free"],
-                ["o2", "co2", "free"],
-            ]
-        )
-
-        for i, training_type in enumerate(day_types):
-            # Stagger times throughout the day (morning/evening)
-            hour = random.choice([7, 8, 9, 18, 19, 20])
-            minute = random.randint(0, 45)
-            ts = day.replace(hour=hour + i, minute=minute, second=0)
-            completed_at = ts.strftime("%Y-%m-%d %H:%M:%S")
-
-            if training_type == "free":
-                # Free hold: 60-115 seconds
-                hold_time = random.randint(60, 115)
-                contractions = random.randint(0, 3)
-                sessions.append(
-                    (
-                        training_type,
-                        float(hold_time),
-                        1,
-                        json.dumps(
-                            {
-                                "hold_time": hold_time,
-                                "contraction_count": contractions,
-                            }
-                        ),
-                        1,
-                        completed_at,
-                    )
-                )
-            elif training_type == "o2":
-                # O2: 8 rounds, hold 60-120s, total ~8-16 min
-                hold = random.randint(60, 120)
-                total = hold * 8 + random.randint(60, 180)  # holds + breathe
-                sessions.append(
-                    (
-                        training_type,
-                        float(total),
-                        8,
-                        json.dumps(
-                            {
-                                "total_rounds": 8,
-                                "hold_time": hold,
-                                "initial_breathe_time": 120,
-                                "breathe_decrement": 15,
-                            }
-                        ),
-                        1,
-                        completed_at,
-                    )
-                )
-            else:  # co2
-                # CO2: 8 rounds, initial hold 60-90s, total ~8-14 min
-                initial_hold = random.randint(60, 90)
-                total = initial_hold * 8 + 15 * 28 + random.randint(30, 120)
-                sessions.append(
-                    (
-                        training_type,
-                        float(total),
-                        8,
-                        json.dumps(
-                            {
-                                "total_rounds": 8,
-                                "initial_hold_time": initial_hold,
-                                "hold_increment": 15,
-                                "breathe_time": 120,
-                            }
-                        ),
-                        1,
-                        completed_at,
-                    )
-                )
-
-    # Also add a couple of sessions for today so the heatmap shows today
-    for training_type in ["o2", "co2"]:
-        hour = 8 if training_type == "o2" else 19
-        completed_at = today.replace(hour=hour, minute=30, second=0).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
-        hold = random.randint(70, 110)
-        total = hold * 8 + random.randint(80, 160)
-        sessions.append(
-            (
-                training_type,
-                float(total),
-                8,
-                json.dumps({"total_rounds": 8, "hold_time": hold}),
-                1,
-                completed_at,
-            )
-        )
-
-    try:
-        conn.executemany(
-            """
-            INSERT INTO practice_sessions
-            (training_type, duration_seconds, rounds_completed,
-             parameters, completed, completed_at)
-            VALUES (?, ?, ?, ?, ?, ?)
-            """,
-            sessions,
-        )
-        conn.commit()
-    finally:
-        conn.close()
-
-
 def main():
     parser = argparse.ArgumentParser(
         description="Generate Apno store listing screenshots"
@@ -196,7 +53,9 @@ def main():
         return 0
 
     # Seed the database once before generating any screenshots
-    _seed_database()
+    from seed_database import seed_database
+
+    seed_database()
 
     devices = {
         "phone": [("phone", 1080, 1920, "3")],
