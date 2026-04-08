@@ -96,7 +96,7 @@ def _seed_database():
             elif training_type == "o2":
                 # O2: 8 rounds, hold 60-120s, total ~8-16 min
                 hold = random.randint(60, 120)
-                total = hold * 8 + random.randint(60, 180)  # holds + rests
+                total = hold * 8 + random.randint(60, 180)  # holds + breathe
                 sessions.append(
                     (
                         training_type,
@@ -106,8 +106,8 @@ def _seed_database():
                             {
                                 "total_rounds": 8,
                                 "hold_time": hold,
-                                "initial_rest_time": 120,
-                                "rest_decrement": 15,
+                                "initial_breathe_time": 120,
+                                "breathe_decrement": 15,
                             }
                         ),
                         1,
@@ -128,7 +128,7 @@ def _seed_database():
                                 "total_rounds": 8,
                                 "initial_hold_time": initial_hold,
                                 "hold_increment": 15,
-                                "rest_time": 120,
+                                "breathe_time": 120,
                             }
                         ),
                         1,

@@ -3,7 +3,7 @@
 Generates 5 WAV files used as audio feedback during training sessions:
 - countdown_tick.wav  — short blip played each second before hold
 - hold_start.wav      — sustained tone signaling hold phase begins
-- rest_start.wav      — low deep ping signaling rest/breathe phase
+- breathe_start.wav   — low deep ping signaling breathe phase
 - session_complete.wav — triple ascending pings signaling session end
 - contraction_tap.wav — quick click for contraction acknowledgment
 
