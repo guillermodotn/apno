@@ -91,7 +91,7 @@ Builder.load_string("""
 
 
 class O2Screen(Screen):
-    """O2 Table Training: Fixed hold time with decreasing rest periods."""
+    """O2 Table Training: Fixed hold time with decreasing breathe periods."""
 
     time_text = StringProperty("00:00")
     phase_text = StringProperty("Ready")
@@ -104,14 +104,14 @@ class O2Screen(Screen):
 
     # Training parameters (in seconds)
     hold_time = NumericProperty(120)  # 2 minutes hold (fixed for O2)
-    initial_rest_time = NumericProperty(120)  # Starting rest time
-    rest_decrement = NumericProperty(15)  # Decrease rest by 15 sec each round
+    initial_breathe_time = NumericProperty(120)  # Starting breathe time
+    breathe_decrement = NumericProperty(15)  # Decrease breathe by 15s each round
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.time_left = 0
         self.current_phase_duration = 0
-        self.phase = "ready"  # ready, breathe, hold, rest, complete
+        self.phase = "ready"  # ready, breathe, hold, complete
         self.timer_event = None
         self.session_start_time = None
         self._update_phase_color()
@@ -158,8 +158,8 @@ class O2Screen(Screen):
                 parameters={
                     "total_rounds": self.total_rounds,
                     "hold_time": self.hold_time,
-                    "initial_rest_time": self.initial_rest_time,
-                    "rest_decrement": self.rest_decrement,
+                    "initial_breathe_time": self.initial_breathe_time,
+                    "breathe_decrement": self.breathe_decrement,
                 },
                 completed=False,
             )
@@ -211,12 +211,15 @@ class O2Screen(Screen):
         self.reset_training(save_incomplete=True)
 
     def _start_breathe_phase(self):
-        """Start the breathe-up phase (15 seconds to prepare)."""
+        """Start the breathe phase (decreases each round)."""
         self.phase = "breathe"
-        self.time_left = 15
-        self.current_phase_duration = 15
+        decrement = (self.current_round - 1) * self.breathe_decrement
+        breathe_time = self.initial_breathe_time - decrement
+        breathe_time = max(breathe_time, 15)  # Minimum 15 seconds
+        self.time_left = breathe_time
+        self.current_phase_duration = breathe_time
         self.phase_text = "Breathe"
-        self.instruction_text = "Take deep, relaxed breaths to prepare"
+        self.instruction_text = "Take deep, relaxed breaths"
         self._update_phase_color()
         self._update_display()
 
@@ -227,20 +230,6 @@ class O2Screen(Screen):
         self.current_phase_duration = self.hold_time
         self.phase_text = "Hold"
         self.instruction_text = "Hold your breath - stay relaxed"
-        self._update_phase_color()
-        self._update_display()
-
-    def _start_rest_phase(self):
-        """Start the rest/recovery phase."""
-        self.phase = "rest"
-        # Calculate rest time for current round (decreases each round)
-        decrement = (self.current_round - 1) * self.rest_decrement
-        rest_time = self.initial_rest_time - decrement
-        rest_time = max(rest_time, 15)  # Minimum 15 seconds rest
-        self.time_left = rest_time
-        self.current_phase_duration = rest_time
-        self.phase_text = "Recover"
-        self.instruction_text = "Breathe and recover for next round"
         self._update_phase_color()
         self._update_display()
 
@@ -268,8 +257,8 @@ class O2Screen(Screen):
                 parameters={
                     "total_rounds": self.total_rounds,
                     "hold_time": self.hold_time,
-                    "initial_rest_time": self.initial_rest_time,
-                    "rest_decrement": self.rest_decrement,
+                    "initial_breathe_time": self.initial_breathe_time,
+                    "breathe_decrement": self.breathe_decrement,
                 },
                 completed=True,
             )
@@ -285,8 +274,8 @@ class O2Screen(Screen):
             if self.time_left == 0:
                 self._next_phase()
             else:
-                # Countdown ticks in last 5 seconds of breathe/rest phases
-                if self.phase in ("breathe", "rest") and self.time_left <= 5:
+                # Countdown ticks in last 5 seconds of breathe phase
+                if self.phase == "breathe" and self.time_left <= 5:
                     audio.play("countdown_tick")
                 self._update_display()
 
@@ -300,11 +289,9 @@ class O2Screen(Screen):
                 audio.play("session_complete")
                 self._complete_training()
             else:
+                self.current_round += 1
                 audio.play("rest_start")
-                self._start_rest_phase()
-        elif self.phase == "rest":
-            self.current_round += 1
-            self._start_breathe_phase()
+                self._start_breathe_phase()
 
     def _update_display(self):
         """Update the timer display and progress."""
@@ -326,9 +313,8 @@ class O2Screen(Screen):
         # Deep Blue theme for O2 training
         colors = {
             "ready": [0.5, 0.5, 0.5, 1],
-            "breathe": [0.6, 0.6, 0.6, 1],  # Grey
+            "breathe": [0.2, 0.7, 0.4, 1],  # Green
             "hold": [0.25, 0.45, 0.85, 1],  # Deep Blue (main O2 color)
-            "rest": [0.2, 0.7, 0.4, 1],  # Green
             "complete": [0.25, 0.45, 0.85, 1],  # Deep Blue
         }
         self.phase_color = colors.get(self.phase, [0.5, 0.5, 0.5, 1])
