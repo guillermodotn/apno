@@ -2,6 +2,7 @@
 
 from datetime import datetime
 
+from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import Screen
 
@@ -12,13 +13,14 @@ from apno.utils.database import (
 from apno.utils.icons import icon
 
 Builder.load_string("""
-#:import StyledCard apno.widgets.styled_card.StyledCard
+#:import ClickableCard apno.widgets.styled_card.ClickableCard
 
-<HistoryEntry@StyledCard>:
+<HistoryEntry@ClickableCard>:
     orientation: "horizontal"
     size_hint_y: None
     height: dp(80)
     spacing: dp(12)
+    session_id: 0
     training_type: ""
     completed_at: ""
     duration_text: ""
@@ -118,6 +120,13 @@ class HistoryScreen(Screen):
         """Refresh the history list when entering the screen."""
         self._load_history()
 
+    def _on_entry_tap(self, entry):
+        """Navigate to the session detail screen."""
+        app = App.get_running_app()
+        detail = app.root.ids.screen_manager.get_screen("session_detail")
+        detail.session_id = entry.session_id
+        app.change_screen("session_detail", "Session Details")
+
     def _load_history(self):
         """Load and display all training sessions."""
         container = self.ids.history_container
@@ -215,6 +224,7 @@ class HistoryScreen(Screen):
 
             entry = Builder.load_string(f"""
 HistoryEntry:
+    session_id: {session["id"]}
     training_type: "{info["name"]}"
     completed_at: "{date_str}"
     duration_text: "{duration_str}"
@@ -222,4 +232,5 @@ HistoryEntry:
     icon_color: {info["color"]}
     icon_name: "{icon(info["icon"])}"
 """)
+            entry.bind(on_release=self._on_entry_tap)
             container.add_widget(entry)
