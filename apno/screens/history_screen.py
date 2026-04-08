@@ -4,6 +4,8 @@ from datetime import datetime
 
 from kivy.app import App
 from kivy.lang import Builder
+from kivy.metrics import dp, sp
+from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 
 from apno.utils.database import (
@@ -100,16 +102,6 @@ Builder.load_string("""
             spacing: dp(12)
             size_hint_y: None
             height: self.minimum_height
-
-            Label:
-                id: empty_label
-                text: "No training sessions yet.\\nStart your first training!"
-                font_size: sp(16)
-                color: 0.5, 0.5, 0.5, 1
-                size_hint_y: None
-                height: dp(100)
-                halign: "center"
-                text_size: self.width, None
 """)
 
 
@@ -132,17 +124,22 @@ class HistoryScreen(Screen):
         container = self.ids.history_container
         sessions = get_practice_sessions(limit=100)
 
-        # Clear previous entries (keep the empty label)
-        empty_label = self.ids.empty_label
-        for child in list(container.children):
-            if child is not empty_label:
-                container.remove_widget(child)
+        # Clear all entries
+        container.clear_widgets()
 
         if not sessions:
-            self.ids.empty_label.opacity = 1
+            container.add_widget(
+                Label(
+                    text="No training sessions yet.\nStart your first training!",
+                    font_size=sp(16),
+                    color=(0.5, 0.5, 0.5, 1),
+                    size_hint_y=None,
+                    height=dp(100),
+                    halign="center",
+                    text_size=(None, None),
+                )
+            )
             return
-
-        self.ids.empty_label.opacity = 0
 
         # Training type display names and colors
         type_info = {
