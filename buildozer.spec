@@ -19,7 +19,7 @@ source.include_exts = py,png,jpg,jpeg,svg,ttf,kv,json,wav
 source.exclude_exts = spec
 
 # Directories to exclude
-source.exclude_dirs = tests,.github,.venv,build,dist,__pycache__,.git,.ruff_cache,.buildozer,bin,scripts
+source.exclude_dirs = tests,.github,.venv,.venv-screenshots,build,dist,__pycache__,.git,.ruff_cache,.buildozer,.buildozer-cache,bin,scripts,site,screenshots
 
 # Application versioning
 version = 0.2.1
