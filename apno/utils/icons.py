@@ -31,7 +31,7 @@ ICONS = {
     "alert": "\U000f0026",
     "heart-pulse": "\U000f5f6c",
     # Detail screen
-    "trophy": "\U000f0548",
+    "trophy": "\U000f0538",
     "calendar": "\U000f00ed",
     "check-circle": "\U000f05e0",
     "alert-circle": "\U000f0028",
