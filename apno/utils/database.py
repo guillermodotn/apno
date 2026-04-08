@@ -248,6 +248,37 @@ def get_practice_sessions(
         conn.close()
 
 
+def get_session_by_id(session_id: int) -> dict | None:
+    """Get a single practice session by its ID.
+
+    Args:
+        session_id: The session ID to look up
+
+    Returns:
+        Session dictionary with parsed parameters, or None if not found
+    """
+    conn = get_connection()
+    try:
+        cursor = conn.execute(
+            """
+            SELECT id, training_type, completed_at, duration_seconds,
+                   rounds_completed, parameters, completed
+            FROM practice_sessions
+            WHERE id = ?
+            """,
+            (session_id,),
+        )
+        row = cursor.fetchone()
+        if not row:
+            return None
+        session = dict(row)
+        if session["parameters"]:
+            session["parameters"] = json.loads(session["parameters"])
+        return session
+    finally:
+        conn.close()
+
+
 def get_sessions_by_date(date: datetime | None = None) -> list[dict]:
     """Get all practice sessions for a specific date.
 
