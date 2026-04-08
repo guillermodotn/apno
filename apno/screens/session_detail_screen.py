@@ -214,15 +214,15 @@ class SessionDetailScreen(Screen):
 
     def _build_hero_card(self, content, value_text, label_text, color, is_best=False):
         """Build the large hero card with the main metric."""
-        card = Builder.load_string("""
+        height = dp(190) if is_best else dp(160)
+        card = Builder.load_string(f"""
 StyledCard:
     orientation: "vertical"
     size_hint_y: None
-    height: dp(160) if not root._is_best else dp(190)
+    height: {height}
     padding: dp(16)
     spacing: dp(4)
 """)
-        card._is_best = is_best
 
         # Value
         value_label = Label(
