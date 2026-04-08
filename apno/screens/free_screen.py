@@ -244,7 +244,7 @@ class FreeScreen(Screen):
 
     def _end_hold(self):
         """End the current breath hold."""
-        audio.play("rest_start")
+        audio.play("breathe_start")
         self._stop_timer()
         self.phase = "ready"
         self.is_holding = False

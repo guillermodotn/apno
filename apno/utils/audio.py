@@ -14,7 +14,7 @@ SOUND_DIR = os.path.join(
 SOUND_NAMES = [
     "countdown_tick",
     "hold_start",
-    "rest_start",
+    "breathe_start",
     "session_complete",
     "contraction_tap",
 ]
@@ -45,7 +45,7 @@ def play(name: str) -> None:
     """Play a sound by name if sound is enabled.
 
     Args:
-        name: One of 'countdown_tick', 'hold_start', 'rest_start',
+        name: One of 'countdown_tick', 'hold_start', 'breathe_start',
               'session_complete', 'contraction_tap'.
     """
     if not _is_sound_enabled():

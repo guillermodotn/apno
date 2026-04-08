@@ -324,7 +324,7 @@ class CO2Screen(Screen):
                 self._complete_training()
             else:
                 self.current_round += 1
-                audio.play("rest_start")
+                audio.play("breathe_start")
                 self._start_breathe_phase()
 
     def _update_display(self):

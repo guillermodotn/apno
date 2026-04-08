@@ -79,9 +79,9 @@ def main():
         generate_tone(900, 0.4, decay=0.5, volume=0.7, freq_sweep=-50),
     )
 
-    # Rest start: low 500Hz ping with long lingering decay
+    # Breathe start: low 500Hz ping with long lingering decay
     save_wav(
-        os.path.join(OUTPUT_DIR, "rest_start.wav"),
+        os.path.join(OUTPUT_DIR, "breathe_start.wav"),
         generate_tone(500, 0.8, decay=2, volume=0.7, freq_sweep=-15),
     )
 
