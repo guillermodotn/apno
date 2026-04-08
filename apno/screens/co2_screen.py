@@ -100,7 +100,7 @@ Builder.load_string("""
 
 
 class CO2Screen(Screen):
-    """CO2 Table Training: Increasing hold time with fixed rest periods."""
+    """CO2 Table Training: Increasing hold time with fixed breathe periods."""
 
     time_text = StringProperty("00:00")
     phase_text = StringProperty("Ready")
@@ -115,13 +115,13 @@ class CO2Screen(Screen):
     # Training parameters (in seconds)
     initial_hold_time = NumericProperty(60)  # Start with 1 minute hold
     hold_increment = NumericProperty(15)  # Increase hold by 15 sec each round
-    rest_time = NumericProperty(120)  # Fixed 2 minutes rest
+    breathe_time = NumericProperty(120)  # Fixed 2 minutes breathe
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.time_left = 0
         self.current_phase_duration = 0
-        self.phase = "ready"  # ready, breathe, hold, rest, complete
+        self.phase = "ready"  # ready, breathe, hold, complete
         self.timer_event = None
         self.session_start_time = None
         self.session_elapsed_time = 0
@@ -179,7 +179,7 @@ class CO2Screen(Screen):
                     "total_rounds": self.total_rounds,
                     "initial_hold_time": self.initial_hold_time,
                     "hold_increment": self.hold_increment,
-                    "rest_time": self.rest_time,
+                    "breathe_time": self.breathe_time,
                 },
                 completed=False,
             )
@@ -204,12 +204,8 @@ class CO2Screen(Screen):
             self.hold_info_text = f"Target hold: {self._format_time(hold_time)}"
         elif self.phase == "hold":
             self.hold_info_text = "Stay relaxed, you've got this!"
-        elif self.phase == "rest":
-            if self.current_round < self.total_rounds:
-                next_hold = self._get_hold_time_for_round(self.current_round + 1)
-                self.hold_info_text = f"Next hold: {self._format_time(next_hold)}"
-            else:
-                self.hold_info_text = "Last round complete!"
+        elif self.phase == "complete":
+            self.hold_info_text = "Training session finished"
         else:
             self.hold_info_text = ""
 
@@ -248,12 +244,12 @@ class CO2Screen(Screen):
         self.reset_training(save_incomplete=True)
 
     def _start_breathe_phase(self):
-        """Start the breathe-up phase (15 seconds to prepare)."""
+        """Start the breathe phase (fixed duration)."""
         self.phase = "breathe"
-        self.time_left = 15
-        self.current_phase_duration = 15
+        self.time_left = self.breathe_time
+        self.current_phase_duration = self.breathe_time
         self.phase_text = "Breathe"
-        self.instruction_text = "Take deep, relaxed breaths to prepare"
+        self.instruction_text = "Take deep, relaxed breaths"
         self._update_hold_info()
         self._update_phase_color()
         self._update_display()
@@ -266,17 +262,6 @@ class CO2Screen(Screen):
         self.current_phase_duration = hold_time
         self.phase_text = "Hold"
         self.instruction_text = "Hold your breath - stay relaxed"
-        self._update_hold_info()
-        self._update_phase_color()
-        self._update_display()
-
-    def _start_rest_phase(self):
-        """Start the rest/recovery phase."""
-        self.phase = "rest"
-        self.time_left = self.rest_time
-        self.current_phase_duration = self.rest_time
-        self.phase_text = "Recover"
-        self.instruction_text = "Breathe and recover for next round"
         self._update_hold_info()
         self._update_phase_color()
         self._update_display()
@@ -307,7 +292,7 @@ class CO2Screen(Screen):
                     "total_rounds": self.total_rounds,
                     "initial_hold_time": self.initial_hold_time,
                     "hold_increment": self.hold_increment,
-                    "rest_time": self.rest_time,
+                    "breathe_time": self.breathe_time,
                 },
                 completed=True,
             )
@@ -323,8 +308,8 @@ class CO2Screen(Screen):
             if self.time_left == 0:
                 self._next_phase()
             else:
-                # Countdown ticks in last 5 seconds of breathe/rest phases
-                if self.phase in ("breathe", "rest") and self.time_left <= 5:
+                # Countdown ticks in last 5 seconds of breathe phase
+                if self.phase == "breathe" and self.time_left <= 5:
                     audio.play("countdown_tick")
                 self._update_display()
 
@@ -338,11 +323,9 @@ class CO2Screen(Screen):
                 audio.play("session_complete")
                 self._complete_training()
             else:
+                self.current_round += 1
                 audio.play("rest_start")
-                self._start_rest_phase()
-        elif self.phase == "rest":
-            self.current_round += 1
-            self._start_breathe_phase()
+                self._start_breathe_phase()
 
     def _update_display(self):
         """Update the timer display and progress."""
@@ -364,9 +347,8 @@ class CO2Screen(Screen):
         # Amber theme for CO2 training
         colors = {
             "ready": [0.5, 0.5, 0.5, 1],
-            "breathe": [0.6, 0.6, 0.6, 1],  # Grey
+            "breathe": [0.2, 0.7, 0.4, 1],  # Green
             "hold": [1.0, 0.7, 0.2, 1],  # Amber (main CO2 color)
-            "rest": [0.2, 0.7, 0.4, 1],  # Green
             "complete": [1.0, 0.7, 0.2, 1],  # Amber
         }
         self.phase_color = colors.get(self.phase, [0.5, 0.5, 0.5, 1])
