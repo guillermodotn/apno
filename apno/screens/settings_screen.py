@@ -24,11 +24,12 @@ Builder.load_string("""
     min_value: 15
     max_value: 300
     accent_color: 0.15, 0.40, 0.65, 1
+    locked: False
 
     Label:
         text: root.setting_label
         font_size: sp(14)
-        color: (0.6, 0.6, 0.6, 1) if root.disabled else (0.2, 0.2, 0.2, 1)
+        color: (0.6, 0.6, 0.6, 1) if root.locked else (0.2, 0.2, 0.2, 1)
         text_size: self.size
         halign: "left"
         valign: "middle"
@@ -47,15 +48,15 @@ Builder.load_string("""
             size: dp(36), dp(36)
             pos_hint: {"center_y": 0.5}
             background_normal: ""
-            background_color: (0.96, 0.96, 0.96, 1) if root.disabled else (0.92, 0.92, 0.92, 1)
-            color: (0.8, 0.8, 0.8, 1) if root.disabled else (0.3, 0.3, 0.3, 1)
-            on_release: root.setting_value = max(root.min_value, root.setting_value - root.step_value)
+            background_color: (0.96, 0.96, 0.96, 1) if root.locked else (0.92, 0.92, 0.92, 1)
+            color: (0.7, 0.7, 0.7, 1) if root.locked else (0.3, 0.3, 0.3, 1)
+            on_release: root.setting_value = root.setting_value if root.locked else max(root.min_value, root.setting_value - root.step_value)
 
         Label:
             text: f"{int(root.setting_value // 60)}:{int(root.setting_value % 60):02d}"
             font_size: sp(16)
             bold: True
-            color: (0.7, 0.7, 0.7, 1) if root.disabled else root.accent_color
+            color: (0.7, 0.7, 0.7, 1) if root.locked else root.accent_color
             size_hint_x: None
             width: dp(50)
             halign: "center"
@@ -68,9 +69,9 @@ Builder.load_string("""
             size: dp(36), dp(36)
             pos_hint: {"center_y": 0.5}
             background_normal: ""
-            background_color: (0.96, 0.96, 0.96, 1) if root.disabled else (0.92, 0.92, 0.92, 1)
-            color: (0.8, 0.8, 0.8, 1) if root.disabled else (0.3, 0.3, 0.3, 1)
-            on_release: root.setting_value = min(root.max_value, root.setting_value + root.step_value)
+            background_color: (0.96, 0.96, 0.96, 1) if root.locked else (0.92, 0.92, 0.92, 1)
+            color: (0.7, 0.7, 0.7, 1) if root.locked else (0.3, 0.3, 0.3, 1)
+            on_release: root.setting_value = root.setting_value if root.locked else min(root.max_value, root.setting_value + root.step_value)
 
 
 <RoundsStepper@BoxLayout>:
@@ -83,11 +84,12 @@ Builder.load_string("""
     min_rounds: 4
     max_rounds: 12
     accent_color: 0.15, 0.40, 0.65, 1
+    locked: False
 
     Label:
         text: "Rounds"
         font_size: sp(14)
-        color: (0.6, 0.6, 0.6, 1) if root.disabled else (0.2, 0.2, 0.2, 1)
+        color: (0.6, 0.6, 0.6, 1) if root.locked else (0.2, 0.2, 0.2, 1)
         text_size: self.size
         halign: "left"
         valign: "middle"
@@ -106,15 +108,15 @@ Builder.load_string("""
             size: dp(36), dp(36)
             pos_hint: {"center_y": 0.5}
             background_normal: ""
-            background_color: (0.96, 0.96, 0.96, 1) if root.disabled else (0.92, 0.92, 0.92, 1)
-            color: (0.8, 0.8, 0.8, 1) if root.disabled else (0.3, 0.3, 0.3, 1)
-            on_release: root.rounds_value = max(root.min_rounds, root.rounds_value - 1)
+            background_color: (0.96, 0.96, 0.96, 1) if root.locked else (0.92, 0.92, 0.92, 1)
+            color: (0.7, 0.7, 0.7, 1) if root.locked else (0.3, 0.3, 0.3, 1)
+            on_release: root.rounds_value = root.rounds_value if root.locked else max(root.min_rounds, root.rounds_value - 1)
 
         Label:
             text: str(int(root.rounds_value))
             font_size: sp(16)
             bold: True
-            color: (0.7, 0.7, 0.7, 1) if root.disabled else root.accent_color
+            color: (0.7, 0.7, 0.7, 1) if root.locked else root.accent_color
             size_hint_x: None
             width: dp(50)
             halign: "center"
@@ -127,9 +129,9 @@ Builder.load_string("""
             size: dp(36), dp(36)
             pos_hint: {"center_y": 0.5}
             background_normal: ""
-            background_color: (0.96, 0.96, 0.96, 1) if root.disabled else (0.92, 0.92, 0.92, 1)
-            color: (0.8, 0.8, 0.8, 1) if root.disabled else (0.3, 0.3, 0.3, 1)
-            on_release: root.rounds_value = min(root.max_rounds, root.rounds_value + 1)
+            background_color: (0.96, 0.96, 0.96, 1) if root.locked else (0.92, 0.92, 0.92, 1)
+            color: (0.7, 0.7, 0.7, 1) if root.locked else (0.3, 0.3, 0.3, 1)
+            on_release: root.rounds_value = root.rounds_value if root.locked else min(root.max_rounds, root.rounds_value + 1)
 
 
 <SectionHeader@BoxLayout>:
@@ -218,7 +220,6 @@ Builder.load_string("""
                 height: self.minimum_height
                 padding: dp(16), dp(16), dp(16), dp(8)
                 spacing: 0
-                disabled: root.auto_configure
 
                 SettingStepper:
                     setting_label: "Hold Time"
@@ -227,6 +228,7 @@ Builder.load_string("""
                     max_value: 300
                     step_value: 15
                     accent_color: 1.0, 0.7, 0.2, 1
+                    locked: root.auto_configure
                     on_setting_value: root.update_o2_hold(self.setting_value)
 
                 Divider:
@@ -238,6 +240,7 @@ Builder.load_string("""
                     max_value: 300
                     step_value: 15
                     accent_color: 1.0, 0.7, 0.2, 1
+                    locked: root.auto_configure
                     on_setting_value: root.update_o2_breathe(self.setting_value)
 
                 Divider:
@@ -249,6 +252,7 @@ Builder.load_string("""
                     max_value: 30
                     step_value: 5
                     accent_color: 1.0, 0.7, 0.2, 1
+                    locked: root.auto_configure
                     on_setting_value: root.update_o2_breathe_decrement(self.setting_value)
 
                 Divider:
@@ -256,6 +260,7 @@ Builder.load_string("""
                 RoundsStepper:
                     rounds_value: root.o2_rounds
                     accent_color: 1.0, 0.7, 0.2, 1
+                    locked: root.auto_configure
                     on_rounds_value: root.update_o2_rounds(self.rounds_value)
 
                 Divider:
@@ -284,7 +289,6 @@ Builder.load_string("""
                 height: self.minimum_height
                 padding: dp(16), dp(16), dp(16), dp(8)
                 spacing: 0
-                disabled: root.auto_configure
 
                 SettingStepper:
                     setting_label: "Initial Hold"
@@ -293,6 +297,7 @@ Builder.load_string("""
                     max_value: 180
                     step_value: 15
                     accent_color: 0.25, 0.45, 0.85, 1
+                    locked: root.auto_configure
                     on_setting_value: root.update_co2_hold(self.setting_value)
 
                 Divider:
@@ -304,6 +309,7 @@ Builder.load_string("""
                     max_value: 30
                     step_value: 5
                     accent_color: 0.25, 0.45, 0.85, 1
+                    locked: root.auto_configure
                     on_setting_value: root.update_co2_increment(self.setting_value)
 
                 Divider:
@@ -315,6 +321,7 @@ Builder.load_string("""
                     max_value: 300
                     step_value: 15
                     accent_color: 0.25, 0.45, 0.85, 1
+                    locked: root.auto_configure
                     on_setting_value: root.update_co2_breathe(self.setting_value)
 
                 Divider:
@@ -322,6 +329,7 @@ Builder.load_string("""
                 RoundsStepper:
                     rounds_value: root.co2_rounds
                     accent_color: 0.25, 0.45, 0.85, 1
+                    locked: root.auto_configure
                     on_rounds_value: root.update_co2_rounds(self.rounds_value)
 
                 Divider:
