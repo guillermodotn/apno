@@ -193,9 +193,9 @@ class SessionDetailScreen(Screen):
         if training_type == "free":
             self._build_free_detail(content, session)
         elif training_type == "o2":
-            self._build_placeholder(content, session, "O2 Tables")
+            self._build_o2_detail(content, session)
         elif training_type == "co2":
-            self._build_placeholder(content, session, "CO2 Tables")
+            self._build_co2_detail(content, session)
 
     def _format_duration(self, seconds):
         """Format seconds as M:SS."""
@@ -476,12 +476,15 @@ StyledCard:
 """)
             content.add_widget(card)
 
-    def _build_placeholder(self, content, session, title):
-        """Placeholder detail view for O2/CO2 (to be implemented)."""
+    def _build_o2_detail(self, content, session):
+        """Build detail view for an O2 table session."""
+        params = session.get("parameters", {}) or {}
         duration = session.get("duration_seconds", 0)
-        training_type = session["training_type"]
-        accent = TYPE_INFO[training_type]["color"]
+        completed = session.get("completed", 1)
+        rounds = session.get("rounds_completed", 0)
+        accent = TYPE_INFO["o2"]["color"]
 
+        # Hero card with session duration
         self._build_hero_card(
             content,
             self._format_duration(duration),
@@ -489,11 +492,11 @@ StyledCard:
             accent,
         )
 
-        completed = session.get("completed", 1)
+        # Session info
         status_icon = "check-circle" if completed else "alert-circle"
         status_color = [0.2, 0.7, 0.4, 1] if completed else [0.8, 0.3, 0.3, 1]
         status_text = "Completed" if completed else "Incomplete"
-        rounds = session.get("rounds_completed", 0)
+        total_rounds = params.get("total_rounds", 8)
 
         info_items = [
             (
@@ -503,6 +506,121 @@ StyledCard:
                 self._format_datetime(session.get("completed_at")),
             ),
             (status_icon, status_color, "Status", status_text),
-            ("timer-outline", accent, "Rounds", str(rounds or 0)),
+            ("timer-outline", accent, "Rounds", f"{rounds}/{total_rounds}"),
         ]
         self._build_info_card(content, info_items)
+
+        # Training parameters section
+        hold_time = params.get("hold_time", 0)
+        initial_breathe = params.get("initial_breathe_time", 120)
+        breathe_decrement = params.get("breathe_decrement", 10)
+        final_breathe = max(
+            15, initial_breathe - (total_rounds - 1) * breathe_decrement
+        )
+
+        section_label = Label(
+            text="Training Parameters",
+            font_size=sp(13),
+            bold=True,
+            color=(0.4, 0.4, 0.4, 1),
+            size_hint_y=None,
+            height=dp(32),
+            text_size=(None, None),
+            halign="left",
+        )
+        section_label.bind(size=lambda w, s: setattr(w, "text_size", s))
+        content.add_widget(section_label)
+
+        param_items = [
+            ("timer", accent, "Hold Time", self._format_duration(hold_time)),
+            (
+                "lungs",
+                [0.2, 0.7, 0.4, 1],
+                "Breathe",
+                f"{self._format_duration(initial_breathe)}"
+                f" to {self._format_duration(final_breathe)}",
+            ),
+            (
+                "minus",
+                [0.4, 0.4, 0.4, 1],
+                "Breathe Decrement",
+                f"{int(breathe_decrement)}s/round",
+            ),
+        ]
+        self._build_info_card(content, param_items)
+
+    def _build_co2_detail(self, content, session):
+        """Build detail view for a CO2 table session."""
+        params = session.get("parameters", {}) or {}
+        duration = session.get("duration_seconds", 0)
+        completed = session.get("completed", 1)
+        rounds = session.get("rounds_completed", 0)
+        accent = TYPE_INFO["co2"]["color"]
+
+        # Hero card with session duration
+        self._build_hero_card(
+            content,
+            self._format_duration(duration),
+            "Session Duration",
+            accent,
+        )
+
+        # Session info
+        status_icon = "check-circle" if completed else "alert-circle"
+        status_color = [0.2, 0.7, 0.4, 1] if completed else [0.8, 0.3, 0.3, 1]
+        status_text = "Completed" if completed else "Incomplete"
+        total_rounds = params.get("total_rounds", 8)
+
+        info_items = [
+            (
+                "calendar",
+                [0.4, 0.4, 0.4, 1],
+                "Date",
+                self._format_datetime(session.get("completed_at")),
+            ),
+            (status_icon, status_color, "Status", status_text),
+            ("timer-outline", accent, "Rounds", f"{rounds}/{total_rounds}"),
+        ]
+        self._build_info_card(content, info_items)
+
+        # Training parameters section
+        initial_hold = params.get("initial_hold_time", 30)
+        hold_increment = params.get("hold_increment", 10)
+        breathe_time = params.get("breathe_time", 120)
+        final_hold = initial_hold + (total_rounds - 1) * hold_increment
+
+        section_label = Label(
+            text="Training Parameters",
+            font_size=sp(13),
+            bold=True,
+            color=(0.4, 0.4, 0.4, 1),
+            size_hint_y=None,
+            height=dp(32),
+            text_size=(None, None),
+            halign="left",
+        )
+        section_label.bind(size=lambda w, s: setattr(w, "text_size", s))
+        content.add_widget(section_label)
+
+        param_items = [
+            (
+                "timer",
+                accent,
+                "Hold",
+                f"{self._format_duration(initial_hold)}"
+                f" to {self._format_duration(final_hold)}",
+            ),
+            (
+                "plus",
+                [0.4, 0.4, 0.4, 1],
+                "Hold Increment",
+                f"{int(hold_increment)}s/round",
+            ),
+            (
+                "lungs",
+                [0.2, 0.7, 0.4, 1],
+                "Breathe Time",
+                self._format_duration(breathe_time),
+            ),
+        ]
+        self._build_info_card(content, param_items)
