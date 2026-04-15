@@ -4,7 +4,7 @@ from kivy.lang import Builder
 from kivy.properties import BooleanProperty, NumericProperty, StringProperty
 from kivy.uix.screenmanager import Screen
 
-from apno.utils.database import load_settings, save_settings
+from apno.utils.database import get_best_score, load_settings, save_settings
 
 Builder.load_string("""
 #:import StyledCard apno.widgets.styled_card.StyledCard
@@ -218,6 +218,8 @@ Builder.load_string("""
                 height: self.minimum_height
                 padding: dp(16), dp(16), dp(16), dp(8)
                 spacing: 0
+                disabled: root.auto_configure
+                opacity: 0.4 if root.auto_configure else 1
 
                 SettingStepper:
                     setting_label: "Hold Time"
@@ -283,6 +285,8 @@ Builder.load_string("""
                 height: self.minimum_height
                 padding: dp(16), dp(16), dp(16), dp(8)
                 spacing: 0
+                disabled: root.auto_configure
+                opacity: 0.4 if root.auto_configure else 1
 
                 SettingStepper:
                     setting_label: "Initial Hold"
@@ -352,6 +356,41 @@ Builder.load_string("""
                 BoxLayout:
                     orientation: "horizontal"
                     size_hint_y: None
+                    height: dp(56)
+
+                    BoxLayout:
+                        orientation: "vertical"
+                        spacing: dp(2)
+
+                        Label:
+                            text: "Auto-configure tables"
+                            font_size: sp(14)
+                            color: 0.2, 0.2, 0.2, 1
+                            text_size: self.size
+                            halign: "left"
+                            valign: "bottom"
+                            size_hint_y: 0.5
+
+                        Label:
+                            text: root.personal_best_text
+                            font_size: sp(12)
+                            color: 0.5, 0.5, 0.5, 1
+                            text_size: self.size
+                            halign: "left"
+                            valign: "top"
+                            size_hint_y: 0.5
+
+                    ToggleSwitch:
+                        active: root.auto_configure
+                        on_active: root.auto_configure = self.active
+                        pos_hint: {"center_y": 0.5}
+                        active_color: 0.15, 0.40, 0.65, 1
+
+                Divider:
+
+                BoxLayout:
+                    orientation: "horizontal"
+                    size_hint_y: None
                     height: dp(48)
 
                     Label:
@@ -416,8 +455,10 @@ class SettingsScreen(Screen):
     co2_rounds = NumericProperty(6)
 
     # General settings
+    auto_configure = BooleanProperty(False)
     keep_screen_on = BooleanProperty(True)
     sound_enabled = BooleanProperty(True)
+    personal_best_text = StringProperty("No personal best yet")
 
     # Summaries
     o2_summary = StringProperty("")
@@ -433,6 +474,7 @@ class SettingsScreen(Screen):
         "co2_hold_increment": float,
         "co2_breathe_time": float,
         "co2_rounds": float,
+        "auto_configure": lambda v: v == "True",
         "keep_screen_on": lambda v: v == "True",
         "sound_enabled": lambda v: v == "True",
     }
@@ -442,9 +484,18 @@ class SettingsScreen(Screen):
         self._loading = True
         self._load_from_db()
         self._loading = False
+        self._update_personal_best_text()
+        if self.auto_configure:
+            self._auto_configure_from_best()
         self._update_summaries()
         # Apply settings after all screens are created
         Clock.schedule_once(lambda dt: self._apply_settings(), 0)
+
+    def on_enter(self, *args):
+        """Refresh personal best and recalculate if auto-configure is on."""
+        self._update_personal_best_text()
+        if self.auto_configure:
+            self._auto_configure_from_best()
 
     def on_leave(self):
         """Re-apply settings when leaving the settings screen."""
@@ -457,6 +508,47 @@ class SettingsScreen(Screen):
     def on_sound_enabled(self, instance, value):
         """Auto-save when sound_enabled changes."""
         self._save_to_db()
+
+    def on_auto_configure(self, instance, value):
+        """Recalculate table parameters when auto-configure changes."""
+        if value:
+            self._auto_configure_from_best()
+        self._save_to_db()
+
+    def _update_personal_best_text(self):
+        """Update the personal best display text."""
+        best = get_best_score("free")
+        if best and best > 0:
+            mins, secs = divmod(int(best), 60)
+            self.personal_best_text = f"Based on best: {mins}:{secs:02d}"
+        else:
+            self.personal_best_text = "No personal best yet"
+
+    def _round_to_5(self, value):
+        """Round a value to the nearest 5 seconds."""
+        return max(5, round(value / 5) * 5)
+
+    def _auto_configure_from_best(self):
+        """Calculate O2/CO2 table parameters from personal best hold."""
+        best = get_best_score("free")
+        if not best or best <= 0:
+            return
+
+        # CO2 Table (internal: o2) — fixed hold at 50%, decreasing breathe
+        self.o2_hold_time = self._round_to_5(best * 0.5)
+        self.o2_initial_breathe = 120  # Standard 2 minutes
+        self.o2_breathe_decrement = 15  # Standard 15s decrement
+        self.o2_rounds = 8
+
+        # O2 Table (internal: co2) — increasing hold from 30%, fixed breathe
+        initial = self._round_to_5(best * 0.3)
+        self.co2_initial_hold = initial
+        self.co2_hold_increment = self._round_to_5((best - initial) / 7)
+        self.co2_breathe_time = 120  # Standard 2 minutes
+        self.co2_rounds = 8
+
+        self._update_summaries()
+        self._apply_settings()
 
     def _format_time(self, seconds):
         """Format seconds as M:SS."""
@@ -535,6 +627,7 @@ class SettingsScreen(Screen):
         self.co2_hold_increment = 10
         self.co2_breathe_time = 120
         self.co2_rounds = 6
+        self.auto_configure = False
         self.keep_screen_on = True
         self.sound_enabled = True
         self._update_summaries()
