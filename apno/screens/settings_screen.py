@@ -28,7 +28,7 @@ Builder.load_string("""
     Label:
         text: root.setting_label
         font_size: sp(14)
-        color: 0.2, 0.2, 0.2, 1
+        color: (0.6, 0.6, 0.6, 1) if root.disabled else (0.2, 0.2, 0.2, 1)
         text_size: self.size
         halign: "left"
         valign: "middle"
@@ -47,15 +47,15 @@ Builder.load_string("""
             size: dp(36), dp(36)
             pos_hint: {"center_y": 0.5}
             background_normal: ""
-            background_color: 0.92, 0.92, 0.92, 1
-            color: 0.3, 0.3, 0.3, 1
+            background_color: (0.96, 0.96, 0.96, 1) if root.disabled else (0.92, 0.92, 0.92, 1)
+            color: (0.8, 0.8, 0.8, 1) if root.disabled else (0.3, 0.3, 0.3, 1)
             on_release: root.setting_value = max(root.min_value, root.setting_value - root.step_value)
 
         Label:
             text: f"{int(root.setting_value // 60)}:{int(root.setting_value % 60):02d}"
             font_size: sp(16)
             bold: True
-            color: root.accent_color
+            color: (0.7, 0.7, 0.7, 1) if root.disabled else root.accent_color
             size_hint_x: None
             width: dp(50)
             halign: "center"
@@ -68,8 +68,8 @@ Builder.load_string("""
             size: dp(36), dp(36)
             pos_hint: {"center_y": 0.5}
             background_normal: ""
-            background_color: 0.92, 0.92, 0.92, 1
-            color: 0.3, 0.3, 0.3, 1
+            background_color: (0.96, 0.96, 0.96, 1) if root.disabled else (0.92, 0.92, 0.92, 1)
+            color: (0.8, 0.8, 0.8, 1) if root.disabled else (0.3, 0.3, 0.3, 1)
             on_release: root.setting_value = min(root.max_value, root.setting_value + root.step_value)
 
 
@@ -87,7 +87,7 @@ Builder.load_string("""
     Label:
         text: "Rounds"
         font_size: sp(14)
-        color: 0.2, 0.2, 0.2, 1
+        color: (0.6, 0.6, 0.6, 1) if root.disabled else (0.2, 0.2, 0.2, 1)
         text_size: self.size
         halign: "left"
         valign: "middle"
@@ -106,15 +106,15 @@ Builder.load_string("""
             size: dp(36), dp(36)
             pos_hint: {"center_y": 0.5}
             background_normal: ""
-            background_color: 0.92, 0.92, 0.92, 1
-            color: 0.3, 0.3, 0.3, 1
+            background_color: (0.96, 0.96, 0.96, 1) if root.disabled else (0.92, 0.92, 0.92, 1)
+            color: (0.8, 0.8, 0.8, 1) if root.disabled else (0.3, 0.3, 0.3, 1)
             on_release: root.rounds_value = max(root.min_rounds, root.rounds_value - 1)
 
         Label:
             text: str(int(root.rounds_value))
             font_size: sp(16)
             bold: True
-            color: root.accent_color
+            color: (0.7, 0.7, 0.7, 1) if root.disabled else root.accent_color
             size_hint_x: None
             width: dp(50)
             halign: "center"
@@ -127,8 +127,8 @@ Builder.load_string("""
             size: dp(36), dp(36)
             pos_hint: {"center_y": 0.5}
             background_normal: ""
-            background_color: 0.92, 0.92, 0.92, 1
-            color: 0.3, 0.3, 0.3, 1
+            background_color: (0.96, 0.96, 0.96, 1) if root.disabled else (0.92, 0.92, 0.92, 1)
+            color: (0.8, 0.8, 0.8, 1) if root.disabled else (0.3, 0.3, 0.3, 1)
             on_release: root.rounds_value = min(root.max_rounds, root.rounds_value + 1)
 
 
@@ -219,7 +219,6 @@ Builder.load_string("""
                 padding: dp(16), dp(16), dp(16), dp(8)
                 spacing: 0
                 disabled: root.auto_configure
-                opacity: 0.4 if root.auto_configure else 1
 
                 SettingStepper:
                     setting_label: "Hold Time"
@@ -286,7 +285,6 @@ Builder.load_string("""
                 padding: dp(16), dp(16), dp(16), dp(8)
                 spacing: 0
                 disabled: root.auto_configure
-                opacity: 0.4 if root.auto_configure else 1
 
                 SettingStepper:
                     setting_label: "Initial Hold"
