@@ -237,17 +237,17 @@ class MonthGrid(BoxLayout):
             elif "co2" in training_types and "o2" in training_types:
                 # Both trainings - diagonal split
                 square = DaySquare(
-                    bg_color=self.CO2_COLOR,
-                    bg_color2=self.O2_COLOR,
+                    bg_color=self.O2_COLOR,
+                    bg_color2=self.CO2_COLOR,
                     is_split=1,
                     day_num=day,
                 )
             elif "co2" in training_types:
-                # CO2 only - orange
-                square = DaySquare(bg_color=self.CO2_COLOR, day_num=day)
-            elif "o2" in training_types:
-                # O2 only - blue
+                # O2 Table (internal co2) - blue
                 square = DaySquare(bg_color=self.O2_COLOR, day_num=day)
+            elif "o2" in training_types:
+                # CO2 Table (internal o2) - amber
+                square = DaySquare(bg_color=self.CO2_COLOR, day_num=day)
             else:
                 # No practice
                 square = DaySquare(bg_color=self.EMPTY_COLOR, day_num=day)

@@ -207,10 +207,10 @@ Builder.load_string("""
             size_hint_y: None
             height: self.minimum_height
 
-            # O2 Section
+            # CO2 Table (internal: o2_screen — fixed hold, decreasing breathe)
             SectionHeader:
-                header_text: "O2 Table"
-                accent_color: 0.25, 0.45, 0.85, 1
+                header_text: "CO2 Table"
+                accent_color: 1.0, 0.7, 0.2, 1
 
             StyledCard:
                 orientation: "vertical"
@@ -225,7 +225,7 @@ Builder.load_string("""
                     min_value: 30
                     max_value: 300
                     step_value: 15
-                    accent_color: 0.25, 0.45, 0.85, 1
+                    accent_color: 1.0, 0.7, 0.2, 1
                     on_setting_value: root.update_o2_hold(self.setting_value)
 
                 Divider:
@@ -236,7 +236,7 @@ Builder.load_string("""
                     min_value: 30
                     max_value: 300
                     step_value: 15
-                    accent_color: 0.25, 0.45, 0.85, 1
+                    accent_color: 1.0, 0.7, 0.2, 1
                     on_setting_value: root.update_o2_breathe(self.setting_value)
 
                 Divider:
@@ -247,14 +247,14 @@ Builder.load_string("""
                     min_value: 5
                     max_value: 30
                     step_value: 5
-                    accent_color: 0.25, 0.45, 0.85, 1
+                    accent_color: 1.0, 0.7, 0.2, 1
                     on_setting_value: root.update_o2_breathe_decrement(self.setting_value)
 
                 Divider:
 
                 RoundsStepper:
                     rounds_value: root.o2_rounds
-                    accent_color: 0.25, 0.45, 0.85, 1
+                    accent_color: 1.0, 0.7, 0.2, 1
                     on_rounds_value: root.update_o2_rounds(self.rounds_value)
 
                 Divider:
@@ -272,10 +272,10 @@ Builder.load_string("""
                         halign: "left"
                         valign: "middle"
 
-            # CO2 Section
+            # O2 Table (internal: co2_screen — increasing hold, fixed breathe)
             SectionHeader:
-                header_text: "CO2 Table"
-                accent_color: 1.0, 0.7, 0.2, 1
+                header_text: "O2 Table"
+                accent_color: 0.25, 0.45, 0.85, 1
 
             StyledCard:
                 orientation: "vertical"
@@ -290,7 +290,7 @@ Builder.load_string("""
                     min_value: 30
                     max_value: 180
                     step_value: 15
-                    accent_color: 1.0, 0.7, 0.2, 1
+                    accent_color: 0.25, 0.45, 0.85, 1
                     on_setting_value: root.update_co2_hold(self.setting_value)
 
                 Divider:
@@ -301,7 +301,7 @@ Builder.load_string("""
                     min_value: 5
                     max_value: 30
                     step_value: 5
-                    accent_color: 1.0, 0.7, 0.2, 1
+                    accent_color: 0.25, 0.45, 0.85, 1
                     on_setting_value: root.update_co2_increment(self.setting_value)
 
                 Divider:
@@ -312,14 +312,14 @@ Builder.load_string("""
                     min_value: 60
                     max_value: 300
                     step_value: 15
-                    accent_color: 1.0, 0.7, 0.2, 1
+                    accent_color: 0.25, 0.45, 0.85, 1
                     on_setting_value: root.update_co2_breathe(self.setting_value)
 
                 Divider:
 
                 RoundsStepper:
                     rounds_value: root.co2_rounds
-                    accent_color: 1.0, 0.7, 0.2, 1
+                    accent_color: 0.25, 0.45, 0.85, 1
                     on_rounds_value: root.update_co2_rounds(self.rounds_value)
 
                 Divider:
@@ -465,7 +465,7 @@ class SettingsScreen(Screen):
 
     def _update_summaries(self):
         """Update the training summary text."""
-        # O2 summary: fixed hold, decreasing breathe
+        # CO2 table summary (internal: o2): fixed hold, decreasing breathe
         final_breathe = max(
             15,
             self.o2_initial_breathe - (self.o2_rounds - 1) * self.o2_breathe_decrement,
@@ -476,7 +476,7 @@ class SettingsScreen(Screen):
             f"breathe {self._format_time(self.o2_initial_breathe)} to {self._format_time(final_breathe)}"  # noqa E501
         )
 
-        # CO2 summary: increasing hold, fixed breathe
+        # O2 table summary (internal: co2): increasing hold, fixed breathe
         final_hold = (
             self.co2_initial_hold + (self.co2_rounds - 1) * self.co2_hold_increment
         )

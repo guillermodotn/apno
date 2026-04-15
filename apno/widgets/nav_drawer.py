@@ -74,14 +74,14 @@ Builder.load_string("""
         on_release: root.nav_to("home", "Apno")
 
     NavDrawerItem:
-        icon_name: "lungs"
-        text: "O2 Tables"
-        on_release: root.nav_to("o2_screen", "O2 Tables")
+        icon_name: "weather-windy"
+        text: "CO2 Table"
+        on_release: root.nav_to("o2_screen", "CO2 Table")
 
     NavDrawerItem:
-        icon_name: "weather-windy"
-        text: "CO2 Tables"
-        on_release: root.nav_to("co2_screen", "CO2 Tables")
+        icon_name: "lungs"
+        text: "O2 Table"
+        on_release: root.nav_to("co2_screen", "O2 Table")
 
     NavDrawerItem:
         icon_name: "timer-outline"

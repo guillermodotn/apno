@@ -144,14 +144,14 @@ class HistoryScreen(Screen):
         # Training type display names and colors
         type_info = {
             "o2": {
-                "name": "O2 Tables",
-                "color": [0.25, 0.45, 0.85, 1],
-                "icon": "lungs",
-            },
-            "co2": {
-                "name": "CO2 Tables",
+                "name": "CO2 Table",
                 "color": [1.0, 0.7, 0.2, 1],
                 "icon": "weather-windy",
+            },
+            "co2": {
+                "name": "O2 Table",
+                "color": [0.25, 0.45, 0.85, 1],
+                "icon": "lungs",
             },
             "free": {
                 "name": "Free Training",

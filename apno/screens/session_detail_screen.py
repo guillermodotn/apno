@@ -84,12 +84,12 @@ Builder.load_string("""
 
 TYPE_INFO = {
     "o2": {
-        "name": "O2 Tables",
-        "color": [0.25, 0.45, 0.85, 1],
+        "name": "CO2 Table",
+        "color": [1.0, 0.7, 0.2, 1],
     },
     "co2": {
-        "name": "CO2 Tables",
-        "color": [1.0, 0.7, 0.2, 1],
+        "name": "O2 Table",
+        "color": [0.25, 0.45, 0.85, 1],
     },
     "free": {
         "name": "Free Training",

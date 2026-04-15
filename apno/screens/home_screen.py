@@ -77,18 +77,18 @@ Builder.load_string("""
                 height: dp(28)
 
             TrainingCard:
-                training_title: "O2 Tables"
-                training_desc: "Fixed hold, decreasing breathe. Improves O2 efficiency."
-                training_icon: root.icon_lungs
-                training_color: 0.25, 0.45, 0.85, 1
-                on_release: app.change_screen("o2_screen", "O2 Tables")
-
-            TrainingCard:
-                training_title: "CO2 Tables"
-                training_desc: "Increasing hold, fixed breathe. Builds CO2 tolerance."
+                training_title: "CO2 Table"
+                training_desc: "Fixed hold, decreasing breathe. Builds CO2 tolerance."
                 training_icon: root.icon_wind
                 training_color: 1.0, 0.7, 0.2, 1
-                on_release: app.change_screen("co2_screen", "CO2 Tables")
+                on_release: app.change_screen("o2_screen", "CO2 Table")
+
+            TrainingCard:
+                training_title: "O2 Table"
+                training_desc: "Increasing hold, fixed breathe. Trains O2 deprivation."
+                training_icon: root.icon_lungs
+                training_color: 0.25, 0.45, 0.85, 1
+                on_release: app.change_screen("co2_screen", "O2 Table")
 
             TrainingCard:
                 training_title: "Free Training"

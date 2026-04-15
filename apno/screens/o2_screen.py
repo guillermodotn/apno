@@ -91,12 +91,12 @@ Builder.load_string("""
 
 
 class O2Screen(Screen):
-    """O2 Table Training: Fixed hold time with decreasing breathe periods."""
+    """CO2 Table Training: Fixed hold time with decreasing breathe periods."""
 
     time_text = StringProperty("00:00")
     phase_text = StringProperty("Ready")
     instruction_text = StringProperty("Press Start to begin training")
-    phase_color = ListProperty([0.25, 0.45, 0.85, 1])  # Deep Blue
+    phase_color = ListProperty([1.0, 0.7, 0.2, 1])  # Amber (CO2 Table)
 
     current_round = NumericProperty(1)
     total_rounds = NumericProperty(8)
@@ -310,11 +310,11 @@ class O2Screen(Screen):
 
     def _update_phase_color(self):
         """Update the color based on current phase."""
-        # Deep Blue theme for O2 training
+        # Amber theme for CO2 table training
         colors = {
             "ready": [0.5, 0.5, 0.5, 1],
             "breathe": [0.2, 0.7, 0.4, 1],  # Green
-            "hold": [0.25, 0.45, 0.85, 1],  # Deep Blue (main O2 color)
-            "complete": [0.25, 0.45, 0.85, 1],  # Deep Blue
+            "hold": [1.0, 0.7, 0.2, 1],  # Amber (CO2 Table)
+            "complete": [1.0, 0.7, 0.2, 1],  # Amber
         }
         self.phase_color = colors.get(self.phase, [0.5, 0.5, 0.5, 1])
