@@ -12,6 +12,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
 
 from apno.utils.database import (
+    get_best_free_duration,
     get_contractions_for_session,
     get_session_by_id,
 )
@@ -322,14 +323,16 @@ StatItem:
 
     def _build_free_detail(self, content, session):
         """Build detail view for a free training session."""
-        params = session.get("parameters", {}) or {}
         duration = session.get("duration_seconds", 0)
         completed = session.get("completed", 1)
         accent = TYPE_INFO["free"]["color"]
 
-        # Check if this was a personal best
-        is_best = params.get("is_alltime_best", False) or params.get(
-            "is_session_best", False
+        # Check if this is the all-time best free training hold
+        best_duration = get_best_free_duration()
+        is_best = (
+            best_duration is not None
+            and duration is not None
+            and abs(duration - best_duration) < 0.1
         )
 
         # Hero card with hold time

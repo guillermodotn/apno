@@ -154,6 +154,24 @@ def get_best_score(training_type: str) -> float | None:
         conn.close()
 
 
+def get_best_free_duration() -> float | None:
+    """Get the longest completed free training hold duration.
+
+    Returns:
+        The best duration in seconds, or None if no completed free sessions
+    """
+    conn = get_connection()
+    try:
+        cursor = conn.execute(
+            "SELECT MAX(duration_seconds) as best FROM practice_sessions "
+            "WHERE training_type = 'free' AND completed = 1"
+        )
+        row = cursor.fetchone()
+        return row["best"] if row and row["best"] is not None else None
+    finally:
+        conn.close()
+
+
 def save_practice_session(
     training_type: str,
     duration_seconds: float | None = None,
