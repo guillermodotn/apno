@@ -9,6 +9,7 @@ from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 
 from apno.utils.database import (
+    get_best_free_duration,
     get_contraction_count_for_session,
     get_practice_sessions,
 )
@@ -45,6 +46,7 @@ Builder.load_string("""
 
         Label:
             text: root.training_type
+            markup: True
             font_size: sp(16)
             bold: True
             color: 0.1, 0.1, 0.1, 1
@@ -123,6 +125,7 @@ class HistoryScreen(Screen):
         """Load and display all training sessions."""
         container = self.ids.history_container
         sessions = get_practice_sessions(limit=100)
+        best_free = get_best_free_duration()
 
         # Clear all entries
         container.clear_widgets()
@@ -219,10 +222,22 @@ class HistoryScreen(Screen):
                 date_str += " (incomplete)"
                 info["color"] = [c * 0.5 for c in info["color"][:3]] + [0.5]
 
+            # Check if this is the best free training hold
+            is_best = (
+                training_type == "free"
+                and best_free is not None
+                and duration is not None
+                and abs(duration - best_free) < 0.1
+            )
+            name = info["name"]
+            if is_best:
+                trophy = icon("trophy")
+                name += f" [color=d9a622][font=Icons]{trophy}[/font][/color]"
+
             entry = Builder.load_string(f"""
 HistoryEntry:
     session_id: {session["id"]}
-    training_type: "{info["name"]}"
+    training_type: "{name}"
     completed_at: "{date_str}"
     duration_text: "{duration_str}"
     rounds_text: "{details_str}"
