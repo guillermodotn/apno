@@ -181,6 +181,9 @@ pyrightconfig.json
 # Development database
 apno.db
 
+# Exported data
+apno_export_*.json
+
 # Local env overrides (keep .env.development in repo as template)
 .env.local
 
