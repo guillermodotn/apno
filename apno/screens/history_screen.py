@@ -170,7 +170,7 @@ class HistoryScreen(Screen):
                 {
                     "name": training_type.title(),
                     "color": [0.5, 0.5, 0.5, 1],
-                    "icon": "dumbbell",
+                    "icon": "timer-outline",
                 },
             )
 

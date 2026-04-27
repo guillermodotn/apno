@@ -3,7 +3,6 @@
 import json
 import os
 import sqlite3
-from datetime import datetime
 from pathlib import Path
 
 from kivy.utils import platform
@@ -297,71 +296,6 @@ def get_session_by_id(session_id: int) -> dict | None:
         conn.close()
 
 
-def get_sessions_by_date(date: datetime | None = None) -> list[dict]:
-    """Get all practice sessions for a specific date.
-
-    Args:
-        date: The date to filter by (defaults to today)
-
-    Returns:
-        List of session dictionaries for that date
-    """
-    if date is None:
-        date = datetime.now()
-
-    date_str = date.strftime("%Y-%m-%d")
-
-    conn = get_connection()
-    try:
-        cursor = conn.execute(
-            """
-            SELECT id, training_type, completed_at, duration_seconds,
-                   rounds_completed, parameters, completed
-            FROM practice_sessions
-            WHERE date(completed_at) = ?
-            ORDER BY completed_at DESC
-            """,
-            (date_str,),
-        )
-
-        sessions = []
-        for row in cursor.fetchall():
-            session = dict(row)
-            if session["parameters"]:
-                session["parameters"] = json.loads(session["parameters"])
-            sessions.append(session)
-        return sessions
-    finally:
-        conn.close()
-
-
-def get_session_count_by_date(days: int = 30) -> dict[str, int]:
-    """Get the count of practice sessions per day for the last N days.
-
-    Args:
-        days: Number of days to look back
-
-    Returns:
-        Dictionary mapping date strings to session counts
-    """
-    conn = get_connection()
-    try:
-        cursor = conn.execute(
-            """
-            SELECT date(completed_at) as session_date, COUNT(*) as count
-            FROM practice_sessions
-            WHERE completed_at >= date('now', ?)
-            GROUP BY date(completed_at)
-            ORDER BY session_date DESC
-            """,
-            (f"-{days} days",),
-        )
-
-        return {row["session_date"]: row["count"] for row in cursor.fetchall()}
-    finally:
-        conn.close()
-
-
 def get_training_types_by_date(days: int = 30) -> dict[str, set[str]]:
     """Get the training types done per day for the last N days.
 
@@ -461,24 +395,6 @@ def get_contraction_count_for_session(session_id: int) -> int:
         )
         row = cursor.fetchone()
         return row["count"] if row else 0
-    finally:
-        conn.close()
-
-
-def save_setting(key: str, value: str) -> None:
-    """Save a single setting to the database.
-
-    Args:
-        key: Setting key
-        value: Setting value as string
-    """
-    conn = get_connection()
-    try:
-        conn.execute(
-            "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
-            (key, value),
-        )
-        conn.commit()
     finally:
         conn.close()
 

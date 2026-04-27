@@ -1,13 +1,18 @@
 import os
 
+from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.graphics import Color, RoundedRectangle
 from kivy.lang import Builder
 from kivy.metrics import dp, sp
 from kivy.properties import BooleanProperty, NumericProperty, StringProperty
+from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
+from kivy.uix.widget import Widget
 
 from apno.utils.database import get_best_score, load_settings, save_settings
+from apno.utils.export import export_sessions_json
 
 Builder.load_string("""
 #:import StyledCard apno.widgets.styled_card.StyledCard
@@ -634,10 +639,6 @@ class SettingsScreen(Screen):
 
     def _show_toast(self, message, duration=3):
         """Show a toast notification at the bottom of the screen."""
-        from kivy.animation import Animation
-        from kivy.graphics import Color, RoundedRectangle
-        from kivy.uix.widget import Widget
-
         app = App.get_running_app()
         root = app.root
         if not root:
@@ -661,9 +662,7 @@ class SettingsScreen(Screen):
         )
 
         # Add text label as child
-        from kivy.uix.label import Label as ToastLabel
-
-        label = ToastLabel(
+        label = Label(
             text=message,
             font_size=sp(14),
             color=(1, 1, 1, 1),
@@ -696,8 +695,6 @@ class SettingsScreen(Screen):
 
     def export_data(self):
         """Export all training data to JSON."""
-        from apno.utils.export import export_sessions_json
-
         filepath = export_sessions_json()
         if not filepath:
             self._show_toast("No training sessions to export")

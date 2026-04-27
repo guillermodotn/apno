@@ -3,6 +3,7 @@
 from calendar import monthrange
 from datetime import datetime, timedelta
 
+from kivy.app import App
 from kivy.graphics import Color, Mesh, RoundedRectangle
 from kivy.lang import Builder
 from kivy.properties import ListProperty, NumericProperty, StringProperty
@@ -284,7 +285,6 @@ class MonthlyHeatmap(ButtonBehavior, BoxLayout):
             self.app.change_screen("history_screen", "Training History")
         else:
             # Try to get app from parent
-            from kivy.app import App
 
             app = App.get_running_app()
             if app:

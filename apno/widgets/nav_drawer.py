@@ -1,4 +1,6 @@
 from kivy.animation import Animation
+from kivy.app import App
+from kivy.clock import Clock
 from kivy.graphics import Color, Rectangle, RoundedRectangle
 from kivy.lang import Builder
 from kivy.metrics import dp
@@ -130,8 +132,6 @@ class NavDrawerItem(ButtonBehavior, BoxLayout):
         super().__init__(**kwargs)
         self.bind(icon_name=self._update_icon)
         # Defer icon update to after init
-        from kivy.clock import Clock
-
         Clock.schedule_once(lambda dt: self._update_icon(), 0)
 
     def _update_icon(self, *args):
@@ -156,8 +156,6 @@ class NavDrawer(BoxLayout):
 
     def nav_to(self, screen_name, title):
         """Navigate to a screen and close the drawer."""
-        from kivy.app import App
-
         app = App.get_running_app()
         app.change_screen(screen_name, title)
 

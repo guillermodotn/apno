@@ -124,7 +124,6 @@ class CO2Screen(Screen):
         self.phase = "ready"  # ready, breathe, hold, complete
         self.timer_event = None
         self.session_start_time = None
-        self.session_elapsed_time = 0
         self._update_phase_color()
 
     def _is_keep_screen_on(self):
