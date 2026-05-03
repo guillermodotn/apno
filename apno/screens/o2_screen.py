@@ -1,4 +1,3 @@
-from kivy.app import App
 from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.properties import (
@@ -11,7 +10,7 @@ from kivy.uix.screenmanager import Screen
 
 from apno.utils import audio
 from apno.utils.database import save_practice_session
-from apno.utils.screen import set_keep_screen_on
+from apno.utils.screen import is_keep_screen_on, set_keep_screen_on
 
 Builder.load_string("""
 #:import ProgressCircle apno.widgets.progress_circle.ProgressCircle
@@ -116,21 +115,10 @@ class O2Screen(Screen):
         self.session_start_time = None
         self._update_phase_color()
 
-    def _is_keep_screen_on(self):
-        """Check if keep_screen_on setting is enabled."""
-        app = App.get_running_app()
-        if app and app.root:
-            try:
-                settings = app.root.ids.screen_manager.get_screen("settings")
-                return settings.keep_screen_on
-            except Exception:
-                pass
-        return True
-
     def on_enter(self):
         """Called when screen is entered."""
         self.reset_training()
-        if self._is_keep_screen_on():
+        if is_keep_screen_on():
             set_keep_screen_on(True)
 
     def on_leave(self):
