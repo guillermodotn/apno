@@ -1,18 +1,14 @@
 import os
 
-from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.graphics import Color, RoundedRectangle
 from kivy.lang import Builder
-from kivy.metrics import dp, sp
 from kivy.properties import BooleanProperty, NumericProperty, StringProperty
-from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
-from kivy.uix.widget import Widget
 
 from apno.utils.database import get_best_score, load_settings, save_settings
 from apno.utils.export import export_sessions_json
+from apno.utils.toast import show_toast
 
 Builder.load_string("""
 #:import StyledCard apno.widgets.styled_card.StyledCard
@@ -637,71 +633,15 @@ class SettingsScreen(Screen):
         self._update_summaries()
         self._apply_settings()
 
-    def _show_toast(self, message, duration=3):
-        """Show a toast notification at the bottom of the screen."""
-        app = App.get_running_app()
-        root = app.root
-        if not root:
-            return
-
-        # Use a plain Widget with canvas drawing — no Label to avoid
-        # texture_update loops
-        toast = Widget(
-            size_hint=(None, None),
-            size=(dp(300), dp(44)),
-            opacity=0,
-        )
-
-        with toast.canvas:
-            Color(0.2, 0.2, 0.2, 0.9)
-            bg_rect = RoundedRectangle(pos=toast.pos, size=toast.size, radius=[dp(22)])
-
-        toast.bind(
-            pos=lambda w, p: setattr(bg_rect, "pos", p),
-            size=lambda w, s: setattr(bg_rect, "size", s),
-        )
-
-        # Add text label as child
-        label = Label(
-            text=message,
-            font_size=sp(14),
-            color=(1, 1, 1, 1),
-            size=toast.size,
-            pos=toast.pos,
-        )
-        toast.bind(
-            pos=lambda w, p: setattr(label, "pos", p),
-            size=lambda w, s: setattr(label, "size", s),
-        )
-        toast.add_widget(label)
-
-        root.add_widget(toast)
-
-        # Position after layout
-        def position(*_args):
-            toast.x = (root.width - toast.width) / 2
-            toast.y = dp(24)
-
-        Clock.schedule_once(position, 0)
-
-        # Fade in, hold, fade out, remove
-        anim = (
-            Animation(opacity=1, duration=0.2)
-            + Animation(duration=duration)
-            + Animation(opacity=0, duration=0.3)
-        )
-        anim.bind(on_complete=lambda *a: root.remove_widget(toast))
-        anim.start(toast)
-
     def export_data(self):
         """Export all training data to JSON."""
         filepath = export_sessions_json()
         if not filepath:
-            self._show_toast("No training sessions to export")
+            show_toast("No training sessions to export")
             return
 
         export_dir = "current directory" if os.environ.get("APNO_DEV") else "Downloads"
-        self._show_toast(f"Data exported to {export_dir}")
+        show_toast(f"Data exported to {export_dir}")
 
     def reset_defaults(self):
         """Reset all settings to defaults."""
