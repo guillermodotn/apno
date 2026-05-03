@@ -233,7 +233,7 @@ Builder.load_string("""
                     step_value: 15
                     accent_color: 1.0, 0.7, 0.2, 1
                     locked: root.auto_configure
-                    on_setting_value: root.update_o2_hold(self.setting_value)
+                    on_setting_value: root._update_setting("o2_hold_time", self.setting_value)
 
                 Divider:
 
@@ -245,7 +245,7 @@ Builder.load_string("""
                     step_value: 15
                     accent_color: 1.0, 0.7, 0.2, 1
                     locked: root.auto_configure
-                    on_setting_value: root.update_o2_breathe(self.setting_value)
+                    on_setting_value: root._update_setting("o2_initial_breathe", self.setting_value)
 
                 Divider:
 
@@ -257,7 +257,7 @@ Builder.load_string("""
                     step_value: 5
                     accent_color: 1.0, 0.7, 0.2, 1
                     locked: root.auto_configure
-                    on_setting_value: root.update_o2_breathe_decrement(self.setting_value)
+                    on_setting_value: root._update_setting("o2_breathe_decrement", self.setting_value)
 
                 Divider:
 
@@ -265,7 +265,7 @@ Builder.load_string("""
                     rounds_value: root.o2_rounds
                     accent_color: 1.0, 0.7, 0.2, 1
                     locked: root.auto_configure
-                    on_rounds_value: root.update_o2_rounds(self.rounds_value)
+                    on_rounds_value: root._update_setting("o2_rounds", self.rounds_value)
 
                 Divider:
 
@@ -302,7 +302,7 @@ Builder.load_string("""
                     step_value: 15
                     accent_color: 0.25, 0.45, 0.85, 1
                     locked: root.auto_configure
-                    on_setting_value: root.update_co2_hold(self.setting_value)
+                    on_setting_value: root._update_setting("co2_initial_hold", self.setting_value)
 
                 Divider:
 
@@ -314,7 +314,7 @@ Builder.load_string("""
                     step_value: 5
                     accent_color: 0.25, 0.45, 0.85, 1
                     locked: root.auto_configure
-                    on_setting_value: root.update_co2_increment(self.setting_value)
+                    on_setting_value: root._update_setting("co2_hold_increment", self.setting_value)
 
                 Divider:
 
@@ -326,7 +326,7 @@ Builder.load_string("""
                     step_value: 15
                     accent_color: 0.25, 0.45, 0.85, 1
                     locked: root.auto_configure
-                    on_setting_value: root.update_co2_breathe(self.setting_value)
+                    on_setting_value: root._update_setting("co2_breathe_time", self.setting_value)
 
                 Divider:
 
@@ -334,7 +334,7 @@ Builder.load_string("""
                     rounds_value: root.co2_rounds
                     accent_color: 0.25, 0.45, 0.85, 1
                     locked: root.auto_configure
-                    on_rounds_value: root.update_co2_rounds(self.rounds_value)
+                    on_rounds_value: root._update_setting("co2_rounds", self.rounds_value)
 
                 Divider:
 
@@ -593,43 +593,9 @@ class SettingsScreen(Screen):
             f"{self._format_time(final_hold)}, {self._format_time(self.co2_breathe_time)} breathe"  # noqa E501
         )
 
-    def update_o2_hold(self, value):
-        self.o2_hold_time = value
-        self._update_summaries()
-        self._apply_settings()
-
-    def update_o2_breathe(self, value):
-        self.o2_initial_breathe = value
-        self._update_summaries()
-        self._apply_settings()
-
-    def update_o2_breathe_decrement(self, value):
-        self.o2_breathe_decrement = value
-        self._update_summaries()
-        self._apply_settings()
-
-    def update_o2_rounds(self, value):
-        self.o2_rounds = value
-        self._update_summaries()
-        self._apply_settings()
-
-    def update_co2_hold(self, value):
-        self.co2_initial_hold = value
-        self._update_summaries()
-        self._apply_settings()
-
-    def update_co2_increment(self, value):
-        self.co2_hold_increment = value
-        self._update_summaries()
-        self._apply_settings()
-
-    def update_co2_breathe(self, value):
-        self.co2_breathe_time = value
-        self._update_summaries()
-        self._apply_settings()
-
-    def update_co2_rounds(self, value):
-        self.co2_rounds = value
+    def _update_setting(self, attr, value):
+        """Update a training parameter and apply changes."""
+        setattr(self, attr, value)
         self._update_summaries()
         self._apply_settings()
 
