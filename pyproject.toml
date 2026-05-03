@@ -22,7 +22,7 @@ release = [
 
 [project]
 name = "apno"
-version = "0.2.1"
+version = "0.3.0"
 description = "Apnea training app."
 authors = [
   {name = "guillermodotn", email = "guillerm0.n@outlook.es"}

@@ -22,7 +22,7 @@ source.exclude_exts = spec
 source.exclude_dirs = tests,.github,.venv,.venv-screenshots,build,dist,__pycache__,.git,.ruff_cache,.buildozer,.buildozer-cache,bin,scripts,site,screenshots
 
 # Application versioning
-version = 0.2.1
+version = 0.3.0
 
 # Application requirements (comma-separated)
 requirements = python3,kivy==2.3.0,pillow
