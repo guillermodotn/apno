@@ -1,6 +1,5 @@
 """Tests for the database layer."""
 
-
 from apno.utils.database import (
     get_best_free_duration,
     get_contraction_count_for_session,
