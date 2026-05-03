@@ -52,3 +52,19 @@ jobs:
 
       - name: Check formatting
         run: uv run ruff format --check .
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+
+      - name: Run tests
+        run: APNO_DEV=1 PYTHONPATH=. uv run --no-project --with pytest pytest tests/
