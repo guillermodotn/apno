@@ -335,9 +335,7 @@ class MonthlyHeatmap(ButtonBehavior, BoxLayout):
 
         # Calculate current streak (consecutive days with any practice)
         streak = self._calculate_streak(practice_data)
-        self.streak_text = (
-            f"{streak} day streak" if streak == 1 else f"{streak} day streak"
-        )
+        self.streak_text = f"{streak} day streak" if streak > 0 else "No streak"
 
         # Build both month grids
         self.ids.prev_month_grid.build_month(
