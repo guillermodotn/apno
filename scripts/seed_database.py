@@ -5,17 +5,21 @@ Creates a realistic training history for development and testing.
 Can be used standalone or imported by other scripts.
 
 Usage:
-    python scripts/seed_database.py
-    python scripts/seed_database.py --days 60
-    python scripts/seed_database.py --clear
+    uv run --env-file .env.development python scripts/seed_database.py
+    uv run --env-file .env.development python scripts/seed_database.py --days 60
+    uv run --env-file .env.development python scripts/seed_database.py --clear
 """
 
 import argparse
 import json
+import os
 import random
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
+
+# Prevent Kivy from intercepting command-line arguments
+os.environ["KIVY_NO_ARGS"] = "1"
 
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
