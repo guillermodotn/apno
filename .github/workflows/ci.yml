@@ -26,7 +26,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          python-version: "3.12"
+          python-version: "3.14"
 
       - name: Install dependencies
         run: uv sync --group dev
@@ -45,7 +45,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          python-version: "3.12"
+          python-version: "3.14"
 
       - name: Install dependencies
         run: uv sync --group dev
@@ -64,7 +64,9 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          python-version: "3.12"
+          python-version: "3.14"
 
       - name: Run tests
-        run: APNO_DEV=1 PYTHONPATH=. uv run --no-project --with pytest pytest tests/
+        env:
+          PYTHONPATH: .
+        run: uv run --env-file .env.development --no-project --with pytest pytest tests/
