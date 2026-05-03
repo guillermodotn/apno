@@ -33,6 +33,7 @@ MANIFEST
 *.manifest
 
 # Buildozer / Android
+.buildozer*
 .buildozer/
 bin/
 *.apk

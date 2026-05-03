@@ -78,7 +78,12 @@ def seed_database(days=30, seed=42, clear=False):
 
             if training_type == "free":
                 hold_time = random.randint(60, 115)
-                contractions = random.randint(0, 3)
+                contraction_count = random.randint(0, 4)
+                # Generate realistic contraction times (typically in last 40% of hold)
+                contraction_times = sorted(
+                    random.uniform(hold_time * 0.6, hold_time - 2)
+                    for _ in range(contraction_count)
+                )
                 sessions.append(
                     (
                         training_type,
@@ -87,11 +92,12 @@ def seed_database(days=30, seed=42, clear=False):
                         json.dumps(
                             {
                                 "hold_time": hold_time,
-                                "contraction_count": contractions,
+                                "contraction_count": contraction_count,
                             }
                         ),
                         1,
                         completed_at,
+                        contraction_times,
                     )
                 )
             elif training_type == "o2":
@@ -155,17 +161,41 @@ def seed_database(days=30, seed=42, clear=False):
         )
 
     try:
-        conn.executemany(
-            """
-            INSERT INTO practice_sessions
-            (training_type, duration_seconds, rounds_completed,
-             parameters, completed, completed_at)
-            VALUES (?, ?, ?, ?, ?, ?)
-            """,
-            sessions,
-        )
+        contraction_count = 0
+        for session in sessions:
+            # Extract contraction times if present (free training only)
+            contraction_times = session[6] if len(session) > 6 else []
+            session_data = session[:6]
+
+            cursor = conn.execute(
+                """
+                INSERT INTO practice_sessions
+                (training_type, duration_seconds, rounds_completed,
+                 parameters, completed, completed_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                session_data,
+            )
+
+            # Insert contraction records
+            if contraction_times:
+                session_id = cursor.lastrowid
+                for seconds in contraction_times:
+                    conn.execute(
+                        """
+                        INSERT INTO contractions
+                        (session_id, seconds_into_hold)
+                        VALUES (?, ?)
+                        """,
+                        (session_id, round(seconds, 1)),
+                    )
+                    contraction_count += 1
+
         conn.commit()
-        print(f"Inserted {len(sessions)} sample sessions over {days} days")
+        print(
+            f"Inserted {len(sessions)} sessions "
+            f"and {contraction_count} contractions over {days} days"
+        )
     finally:
         conn.close()
 
