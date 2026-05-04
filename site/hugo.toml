@@ -1,11 +1,14 @@
 baseURL = "https://guillermodotn.github.io/apno/"
 languageCode = "en"
-title = "Apno"
+title = "Apno - Free Apnea & Breath-Hold Training App"
+enableRobotsTXT = true
 
 [markup.goldmark.renderer]
 unsafe = true
 
 [params]
-description = "A cross-platform apnea and breath-holding training app"
+description = "A free, open-source apnea training app with O2 tables, CO2 tables, and free training for freedivers and spearfishers."
 playStoreURL = "https://play.google.com/store/apps/details?id=io.github.guillermodotn.apno"
 githubURL = "https://github.com/guillermodotn/apno"
+ogImage = "images/og-image.png"
+themeColor = "#0a2540"
