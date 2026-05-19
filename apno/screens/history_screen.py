@@ -106,13 +106,36 @@ Builder.load_string("""
             height: self.minimum_height
 """)
 
+_PAGE_SIZE = 20
+
+_TYPE_INFO = {
+    "o2": {
+        "name": "CO2 Table",
+        "color": [1.0, 0.7, 0.2, 1],
+        "icon": "weather-windy",
+    },
+    "co2": {
+        "name": "O2 Table",
+        "color": [0.25, 0.45, 0.85, 1],
+        "icon": "lungs",
+    },
+    "free": {
+        "name": "Free Training",
+        "color": [0.4, 0.4, 0.8, 1],
+        "icon": "timer-outline",
+    },
+}
+
 
 class HistoryScreen(Screen):
-    """Screen showing all training history."""
+    """Screen showing all training history with paginated loading."""
 
     def on_enter(self):
         """Refresh the history list when entering the screen."""
-        self._load_history()
+        self._offset = 0
+        self._best_free = get_best_free_duration()
+        self.ids.history_container.clear_widgets()
+        self._load_page()
 
     def _on_entry_tap(self, entry):
         """Navigate to the session detail screen."""
@@ -121,16 +144,12 @@ class HistoryScreen(Screen):
         detail.session_id = entry.session_id
         app.change_screen("session_detail", "Session Details")
 
-    def _load_history(self):
-        """Load and display all training sessions."""
+    def _load_page(self):
+        """Load the next page of sessions and append to the list."""
+        sessions = get_practice_sessions(limit=_PAGE_SIZE, offset=self._offset)
         container = self.ids.history_container
-        sessions = get_practice_sessions(limit=100)
-        best_free = get_best_free_duration()
 
-        # Clear all entries
-        container.clear_widgets()
-
-        if not sessions:
+        if not sessions and self._offset == 0:
             container.add_widget(
                 Label(
                     text="No training sessions yet.\nStart your first training!",
@@ -144,105 +163,110 @@ class HistoryScreen(Screen):
             )
             return
 
-        # Training type display names and colors
-        type_info = {
-            "o2": {
-                "name": "CO2 Table",
-                "color": [1.0, 0.7, 0.2, 1],
-                "icon": "weather-windy",
-            },
-            "co2": {
-                "name": "O2 Table",
-                "color": [0.25, 0.45, 0.85, 1],
-                "icon": "lungs",
-            },
-            "free": {
-                "name": "Free Training",
-                "color": [0.4, 0.4, 0.8, 1],
+        for session in sessions:
+            container.add_widget(self._build_entry(session))
+
+        if len(sessions) == _PAGE_SIZE:
+            self._offset += _PAGE_SIZE
+            self._add_load_more_button()
+
+    def _add_load_more_button(self):
+        """Add a 'Load more' button at the bottom of the list."""
+        from apno.widgets.styled_button import OutlinedButton
+
+        btn = OutlinedButton(
+            text="Load more",
+            size_hint_y=None,
+            height=dp(48),
+        )
+        btn.bind(on_release=self._on_load_more)
+        self.ids.history_container.add_widget(btn)
+
+    def _on_load_more(self, btn):
+        """Handle 'Load more' button tap."""
+        self.ids.history_container.remove_widget(btn)
+        self._load_page()
+
+    def _build_entry(self, session):
+        """Build a HistoryEntry widget from a session dict."""
+        training_type = session.get("training_type", "")
+        info = _TYPE_INFO.get(
+            training_type,
+            {
+                "name": training_type.title(),
+                "color": [0.5, 0.5, 0.5, 1],
                 "icon": "timer-outline",
             },
-        }
+        )
+        color = list(info["color"])
 
-        for session in sessions:
-            training_type = session.get("training_type", "")
-            info = type_info.get(
-                training_type,
-                {
-                    "name": training_type.title(),
-                    "color": [0.5, 0.5, 0.5, 1],
-                    "icon": "timer-outline",
-                },
+        # Format date
+        completed_at = session.get("completed_at", "")
+        if completed_at:
+            try:
+                dt = datetime.fromisoformat(completed_at.replace("Z", "+00:00"))
+                date_str = dt.strftime("%b %d, %Y at %I:%M %p")
+            except ValueError:
+                date_str = str(completed_at)
+        else:
+            date_str = "Unknown date"
+
+        # Format duration
+        duration = session.get("duration_seconds")
+        if duration:
+            minutes = int(duration // 60)
+            seconds = int(duration % 60)
+            duration_str = f"{minutes}m {seconds}s"
+        else:
+            duration_str = ""
+
+        # Format rounds
+        rounds = session.get("rounds_completed")
+        rounds_str = f"{rounds} rounds" if rounds else ""
+
+        # Get contraction count
+        session_id = session.get("id")
+        contraction_count = (
+            get_contraction_count_for_session(session_id) if session_id else 0
+        )
+        contractions_str = (
+            f"{contraction_count} contractions" if contraction_count > 0 else ""
+        )
+
+        # Combine rounds and contractions for display
+        details_str = rounds_str
+        if contractions_str:
+            details_str = (
+                f"{rounds_str} | {contractions_str}" if rounds_str else contractions_str
             )
 
-            # Format date
-            completed_at = session.get("completed_at", "")
-            if completed_at:
-                try:
-                    dt = datetime.fromisoformat(completed_at.replace("Z", "+00:00"))
-                    date_str = dt.strftime("%b %d, %Y at %I:%M %p")
-                except ValueError:
-                    date_str = str(completed_at)
-            else:
-                date_str = "Unknown date"
+        # Dim incomplete sessions
+        completed = session.get("completed", 1)
+        if not completed:
+            date_str += " (incomplete)"
+            color = [c * 0.5 for c in color[:3]] + [0.5]
 
-            # Format duration
-            duration = session.get("duration_seconds")
-            if duration:
-                minutes = int(duration // 60)
-                seconds = int(duration % 60)
-                duration_str = f"{minutes}m {seconds}s"
-            else:
-                duration_str = ""
+        # Check if this is the best free training hold
+        name = info["name"]
+        is_best = (
+            training_type == "free"
+            and self._best_free is not None
+            and duration is not None
+            and abs(duration - self._best_free) < 0.1
+        )
+        if is_best:
+            trophy = icon("trophy")
+            name += f" [color=d9a622][font=Icons]{trophy}[/font][/color]"
 
-            # Format rounds
-            rounds = session.get("rounds_completed")
-            rounds_str = f"{rounds} rounds" if rounds else ""
-
-            # Get contraction count
-            session_id = session.get("id")
-            contraction_count = (
-                get_contraction_count_for_session(session_id) if session_id else 0
-            )
-            contractions_str = (
-                f"{contraction_count} contractions" if contraction_count > 0 else ""
-            )
-
-            # Combine rounds and contractions for display
-            details_str = rounds_str
-            if contractions_str:
-                details_str = (
-                    f"{rounds_str} | {contractions_str}"
-                    if rounds_str
-                    else contractions_str
-                )
-
-            # Dim incomplete sessions
-            completed = session.get("completed", 1)
-            if not completed:
-                date_str += " (incomplete)"
-                info["color"] = [c * 0.5 for c in info["color"][:3]] + [0.5]
-
-            # Check if this is the best free training hold
-            is_best = (
-                training_type == "free"
-                and best_free is not None
-                and duration is not None
-                and abs(duration - best_free) < 0.1
-            )
-            name = info["name"]
-            if is_best:
-                trophy = icon("trophy")
-                name += f" [color=d9a622][font=Icons]{trophy}[/font][/color]"
-
-            entry = Builder.load_string(f"""
+        entry = Builder.load_string(f"""
 HistoryEntry:
     session_id: {session["id"]}
     training_type: "{name}"
     completed_at: "{date_str}"
     duration_text: "{duration_str}"
     rounds_text: "{details_str}"
-    icon_color: {info["color"]}
+    icon_color: {color}
     icon_name: "{icon(info["icon"])}"
 """)
-            entry.bind(on_release=self._on_entry_tap)
-            container.add_widget(entry)
+        entry.bind(on_release=self._on_entry_tap)
+        return entry
