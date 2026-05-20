@@ -23,7 +23,7 @@ def is_keep_screen_on() -> bool:
     app = App.get_running_app()
     if app and app.root:
         try:
-            settings = app.root.ids.screen_manager.get_screen("settings")
+            settings = app.root.ids.screen_manager.get_screen("settings_screen")
             return settings.keep_screen_on
         except Exception:
             pass

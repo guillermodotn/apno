@@ -34,7 +34,7 @@ def _is_sound_enabled() -> bool:
     app = App.get_running_app()
     if app and app.root:
         try:
-            settings = app.root.ids.screen_manager.get_screen("settings")
+            settings = app.root.ids.screen_manager.get_screen("settings_screen")
             return settings.sound_enabled
         except Exception:
             pass
