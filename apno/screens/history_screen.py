@@ -92,6 +92,7 @@ Builder.load_string("""
 
 <HistoryScreen>:
     ScrollView:
+        id: scroll_view
         do_scroll_x: False
         bar_width: dp(4)
         bar_color: 0.5, 0.5, 0.5, 0.5
@@ -133,9 +134,20 @@ class HistoryScreen(Screen):
     def on_enter(self):
         """Refresh the history list when entering the screen."""
         self._offset = 0
+        self._has_more = True
         self._best_free = get_best_free_duration()
         self.ids.history_container.clear_widgets()
         self._load_page()
+        self.ids.scroll_view.bind(on_scroll_stop=self._on_scroll_stop)
+
+    def on_leave(self):
+        """Unbind scroll listener when leaving the screen."""
+        self.ids.scroll_view.unbind(on_scroll_stop=self._on_scroll_stop)
+
+    def _on_scroll_stop(self, sv, *_args):
+        """Load more sessions when the user scrolls to the bottom."""
+        if sv.scroll_y <= 0 and self._has_more:
+            self._load_page()
 
     def _on_entry_tap(self, entry):
         """Navigate to the session detail screen."""
@@ -161,31 +173,14 @@ class HistoryScreen(Screen):
                     text_size=(None, None),
                 )
             )
+            self._has_more = False
             return
 
         for session in sessions:
             container.add_widget(self._build_entry(session))
 
-        if len(sessions) == _PAGE_SIZE:
-            self._offset += _PAGE_SIZE
-            self._add_load_more_button()
-
-    def _add_load_more_button(self):
-        """Add a 'Load more' button at the bottom of the list."""
-        from apno.widgets.styled_button import OutlinedButton
-
-        btn = OutlinedButton(
-            text="Load more",
-            size_hint_y=None,
-            height=dp(48),
-        )
-        btn.bind(on_release=self._on_load_more)
-        self.ids.history_container.add_widget(btn)
-
-    def _on_load_more(self, btn):
-        """Handle 'Load more' button tap."""
-        self.ids.history_container.remove_widget(btn)
-        self._load_page()
+        self._offset += len(sessions)
+        self._has_more = len(sessions) == _PAGE_SIZE
 
     def _build_entry(self, session):
         """Build a HistoryEntry widget from a session dict."""
