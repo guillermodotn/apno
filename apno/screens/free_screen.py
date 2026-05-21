@@ -176,6 +176,7 @@ class FreeScreen(Screen):
         self._update_phase_color()
         if hasattr(self, "ids") and "progress_circle" in self.ids:
             self.ids.progress_circle.set_progress(0, duration=0.3)
+            self.ids.progress_circle.set_overlay(0, duration=0.3)
 
     def reset_session(self):
         """Full reset including hold count and session best time."""
@@ -329,10 +330,18 @@ class FreeScreen(Screen):
         if not hasattr(self, "ids") or "progress_circle" not in self.ids:
             return
 
-        # Progress based on a 3-minute target (180 seconds)
-        target_time = 180
-        progress = min(100, (self.elapsed_time / target_time) * 100)
-        self.ids.progress_circle.set_progress(progress, duration=0.1)
+        target_time = self.alltime_best if self.alltime_best > 0 else 60
+        circle = self.ids.progress_circle
+
+        if self.elapsed_time <= target_time:
+            progress = (self.elapsed_time / target_time) * 100
+            circle.set_progress(min(100, progress), duration=0.1)
+            circle.set_overlay(0, duration=0.1)
+        else:
+            circle.set_progress(100, duration=0.1)
+            overtime = self.elapsed_time - target_time
+            overlay = (overtime % target_time) / target_time * 100
+            circle.set_overlay(overlay, duration=0.1)
 
     def _update_phase_color(self):
         """Update the color based on current phase."""
