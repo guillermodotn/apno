@@ -5,10 +5,9 @@ from kivy.uix.screenmanager import Screen
 
 from apno.utils import audio
 from apno.utils.database import (
-    get_best_score,
+    get_best_free_duration,
     save_contraction,
     save_practice_session,
-    save_score,
 )
 from apno.utils.screen import is_keep_screen_on, set_keep_screen_on
 
@@ -191,7 +190,7 @@ class FreeScreen(Screen):
 
     def _load_alltime_best(self):
         """Load the all-time best from the database."""
-        best = get_best_score("free")
+        best = get_best_free_duration()
         if best is not None:
             self.alltime_best = best
             self._update_alltime_best_display()
@@ -267,7 +266,6 @@ class FreeScreen(Screen):
         # Check for new all-time best
         if is_new_alltime_best:
             self.alltime_best = self.elapsed_time
-            save_score("free", self.elapsed_time)
             self._update_alltime_best_display()
             self.phase_text = "New All-Time Best!"
             self.instruction_text = "Amazing! You've set a new personal record!"
