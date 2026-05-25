@@ -25,7 +25,7 @@ source.exclude_dirs = tests,.github,.venv,.venv-screenshots,build,dist,__pycache
 version = 0.3.1
 
 # Application requirements (comma-separated)
-requirements = python3==3.12.9,kivy==2.3.0,pillow
+requirements = hostpython3==3.12.9,python3==3.12.9,kivy==2.3.0,pillow
 
 # Supported orientations (portrait, landscape, all)
 orientation = portrait
