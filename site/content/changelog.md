@@ -3,6 +3,20 @@ title: "Changelog"
 description: "Release history for Apno"
 ---
 
+## v0.3.1
+
+### Features
+
+- History pagination with infinite scroll
+- Free training progress ring scaled to personal best, with gold overlay on extra cycles
+
+### Fixes
+
+- Fix free training personal best loaded from session history instead of a separate scores table
+- Fix sound and keep-screen-on settings not being applied during training
+
+---
+
 ## v0.3.0
 
 ### Features
