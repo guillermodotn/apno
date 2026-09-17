@@ -50,6 +50,10 @@ track = "alpha"
 [tool.hatch.build.targets.wheel]
 packages = ["apno"]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
 [tool.ruff]
 target-version = "py312"
 exclude = [
