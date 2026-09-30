@@ -80,10 +80,10 @@ jobs:
           echo "track=$TRACK" >> $GITHUB_OUTPUT
 
       - name: Deploy to Google Play
-        uses: r0adkll/upload-google-play@v1.1.5
+        uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_CREDENTIALS }}
           packageName: ${{ env.PACKAGE_NAME }}
           releaseFiles: bin/*.aab
-          track: ${{ steps.track.outputs.track }}
+          tracks: ${{ steps.track.outputs.track }}
           status: completed

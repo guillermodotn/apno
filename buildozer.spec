@@ -37,7 +37,7 @@ fullscreen = 1
 # android.permissions = INTERNET
 
 # Android API to use for the build
-android.api = 35
+android.api = 36
 
 # Minimum Android API level
 android.minapi = 21
