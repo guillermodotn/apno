@@ -25,7 +25,7 @@ source.exclude_dirs = tests,.github,.venv,.venv-screenshots,build,dist,__pycache
 version = 0.3.1
 
 # Application requirements (comma-separated)
-requirements = hostpython3==3.13.0,python3==3.13.0,kivy==2.3.1,pillow
+requirements = hostpython3==3.14.2,python3==3.14.2,kivy==2.3.1,pillow,charset_normalizer==3.3.2
 
 # Supported orientations (portrait, landscape, all)
 orientation = portrait
@@ -40,10 +40,10 @@ fullscreen = 1
 android.api = 36
 
 # Minimum Android API level
-android.minapi = 21
+android.minapi = 24
 
 # Android NDK version
-android.ndk = 27c
+android.ndk = 28c
 
 # Android architectures to build for (arm64 only, 99%+ of active devices)
 android.archs = arm64-v8a
